@@ -21,7 +21,7 @@ Java Edition required. SpawnerSilk is mainly compatible with Bukkit, Spigot and 
 
 ## Documentation
 
-Official SpawnerSilk Documentation is available [here](https://apavarino.github.io/SpawnerSilk/)
+Official SpawnerSilk documentation is available [here](https://stellionix.github.io/SpawnerSilk/)
 
 ## Statistics
 <img align="center" src="https://bstats.org/signatures/bukkit/Spawnersilk.svg" alt="stats"/> 

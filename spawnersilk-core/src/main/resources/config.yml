@@ -1,72 +1,68 @@
 ####################################################################################################
-# SpawnerSilk configuration
-# Changes made in this file are applied with /sps reload.
-####################################################################################################
-
-####################################################################################################
 # SpawnerSilk Configuration
 #
-# Plugin page and documentation:
+# Project pages:
 #   https://dev.bukkit.org/projects/spawnersilk
+#   https://www.curseforge.com/minecraft/bukkit-plugins/spawnersilk
 #
-# Support (Discord):
+# Community support:
 #   https://discordapp.com/invite/jCsvJxS
 #
-# After editing this file, run '/sps reload' to apply the new settings.
+# Run '/sps reload' after editing this file to apply your changes.
 ####################################################################################################
 
 localization:
-  # Language file loaded from plugins/SpawnerSilk/localization/<language>.json
-  # The plugin currently ships with en_us only.
+  # Language file loaded from plugins/SpawnerSilk/localization/<language>.json.
+  # The plugin currently includes en_us only.
   language: en_us
 
 updates:
-  # Automatically download and install compatible updates when available.
+  # Automatically download and install supported updates when available.
   auto-download: true
 
 mining:
-  # Require Silk Touch to break a spawner at all.
+  # Require Silk Touch to break a spawner.
   require-silk-touch-to-break: false
 
-  # Require Silk Touch for the spawner to drop when broken.
+  # Require Silk Touch for a spawner item to drop.
   require-silk-touch-to-drop: true
 
-  # Minimum pickaxe tier required to obtain a spawner.
+  # Minimum pickaxe tier required to collect a spawner.
   # 0 = any tool
   # 1 = wooden pickaxe or better
   # 2 = stone pickaxe or better
   # 3 = iron pickaxe or better
   # 4 = golden pickaxe or better
   # 5 = diamond pickaxe or better
-  # 6 = netherite pickaxe only
+  # 6 = netherite pickaxe or better
   required-pickaxe-tier: 5
 
 drops:
-  # Drop mode:
+  # Spawner drop mode:
   # 0 = drop a typed spawner item
   # 1 = drop a basic spawner plus a spawn egg
   mode: 0
 
-  # Chance in percent to drop a spawner when broken.
+  # Chance, in percent, to drop a spawner when it is broken.
   spawner-chance: 100
 
-  # Chance in percent to drop a spawn egg when mode = 1.
+  # Chance, in percent, to drop a spawn egg when mode = 1.
   egg-chance: 100
 
-  # Chance in percent to drop a spawner after an explosion.
+  # Chance, in percent, to drop a spawner after an explosion.
   explosion-chance: 10
 
-  # Send the drop directly to the player's inventory when possible.
+  # Send drops directly to the player's inventory when possible.
   to-inventory: false
 
-  # Allow spawners to drop while the player is in creative mode.
+  # Allow spawners to drop when the player is in Creative mode.
   allow-in-creative: false
 
 interaction:
-  # Allow players to change a spawner type with spawn eggs.
+  # Allow players to change spawner types with spawn eggs.
   allow-egg-modification: true
 
-  # Consume the spawn egg when modifying a spawner.
+  # Consume the spawn egg when changing a spawner type.
   consume-egg: true
 
 experience:
@@ -74,27 +70,27 @@ experience:
   drop-from-spawners: false
 
 overlay:
-  # Show hologram details while looking at a spawner.
+  # Show an overlay while the player is looking at a spawner.
   enabled: true
 
-  # Time in seconds before the overlay disappears.
+  # Duration, in seconds, before the overlay disappears.
   duration-seconds: 10
 
 feedback:
-  # Show player-facing error messages during spawner breaking.
+  # Show player-facing error messages when breaking spawners.
   break-errors: true
 
   # Show a success message after placing a spawner.
   place-success: false
 
-  # Show player-facing error messages during spawner interaction.
+  # Show player-facing error messages during spawner interactions.
   interact-errors: true
 
-  # Show a success message after changing a spawner with an egg.
+  # Show a success message after changing a spawner with a spawn egg.
   interact-success: false
 
 restrictions:
-  # Spawner types that must never be collected.
-  # Values are entity names in uppercase, using underscores for spaces.
+  # Spawner types that can never be collected.
+  # Use uppercase entity names with underscores.
   blacklist:
     - BOAT_SPAWNER

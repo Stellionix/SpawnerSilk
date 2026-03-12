@@ -1,0 +1,65 @@
+name: Deploy Documentation
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "docs/**"
+      - "mkdocs.yml"
+      - "requirements.txt"
+      - ".github/workflows/docs.yml"
+      - "spawnersilk-core/src/main/resources/plugin.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: docs-mike
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set Up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install Documentation Dependencies
+        run: pip install -r requirements.txt
+
+      - name: Resolve Documentation Version
+        id: version
+        shell: bash
+        run: |
+          VERSION=$(python - <<'PY'
+          import re
+          from pathlib import Path
+
+          content = Path("spawnersilk-core/src/main/resources/plugin.yml").read_text(encoding="utf-8")
+          match = re.search(r'^version:\s*"?(.*?)"?\s*$', content, re.MULTILINE)
+          if not match:
+              raise SystemExit("Unable to resolve plugin version from plugin.yml")
+          print(match.group(1))
+          PY
+          )
+          echo "value=$VERSION" >> "$GITHUB_OUTPUT"
+
+      - name: Configure Git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      - name: Deploy Versioned Documentation
+        run: |
+          mike deploy --push --update-aliases 5.8.0 latest
+          mike set-default --push latest

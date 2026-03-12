@@ -3,36 +3,36 @@ main: me.crylonz.spawnersilk.SpawnerSilk
 version: "5.8.0"
 author: Crylonz
 softdepend: [ShopGUIPlus]
-description: Spawner is droppable
+description: Mine and manage mob spawners with Silk Touch
 api-version: "1.13"
 
 commands:
-    givespawner:
-      description: Give a spawner to a specifical player
-      usage: /givespawner <Player> <SpawnerType> [Amount]
-      permission: spawnersilk.givespawner
-      aliases : [gs]
-    editspawner:
-      description: Modify the spawner that you looking at
-      usage: /editspawner <spawnRange|spawnCount|MaxNearbyEntities|RequiredPlayerRange|Delay|MaxSpawnDelay|MinSpawnDelay> [Value]
-      permission: spawnersilk.editSpawner
-      aliases : [es]
-    sps:
-      description: General command for SpawnerSilk
-      usage: /sps <params>
+  givespawner:
+    description: Give a spawner to a target player
+    usage: /givespawner <player> <spawnerType> [amount]
+    permission: spawnersilk.givespawner
+    aliases: [gs]
+  editspawner:
+    description: Edit the spawner block you are looking at
+    usage: /editspawner <spawnRange|spawnCount|maxNearbyEntities|requiredPlayerRange|delay|maxSpawnDelay|minSpawnDelay> [value]
+    permission: spawnersilk.editSpawner
+    aliases: [es]
+  sps:
+    description: Main command for SpawnerSilk
+    usage: /sps <subcommand>
 permissions:
   spawnersilk.minespawner:
-    description: Allows you to mine spawner
+    description: Allows players to mine spawners
     default: true
   spawnersilk.givespawner:
-      description: Allows you to give you spawner by command
-      default: op
+    description: Allows players to give spawners with a command
+    default: op
   spawnersilk.editspawner:
-    description: Allows you to edit you spawner by command
+    description: Allows players to edit spawners with a command
     default: op
   spawnersilk.overlay:
-      description: Allows you to see spawner stats
-      default: op
+    description: Allows players to view spawner overlay information
+    default: op
   spawnersilk.reload:
-      description: Allows you to reload the plugin
-      default: op
+    description: Allows players to reload the plugin
+    default: op
