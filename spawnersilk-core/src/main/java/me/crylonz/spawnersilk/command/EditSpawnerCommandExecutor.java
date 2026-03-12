@@ -1,6 +1,6 @@
 package me.crylonz.spawnersilk.command;
 
-import org.bukkit.ChatColor;
+import me.crylonz.spawnersilk.SpawnerSilk;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.CreatureSpawner;
@@ -10,6 +10,12 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 public class EditSpawnerCommandExecutor implements CommandExecutor {
+
+	private final SpawnerSilk plugin;
+
+	public EditSpawnerCommandExecutor(SpawnerSilk plugin) {
+		this.plugin = plugin;
+	}
 
 	@Override
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
@@ -41,8 +47,7 @@ public class EditSpawnerCommandExecutor implements CommandExecutor {
 					cs.update();
 					block.setBlockData(cs.getBlockData());
 				}
-				player.sendMessage(ChatColor.GOLD + "[SpawnerSilk] " + ChatColor.WHITE +
-						"SpawnRange value set to : " + ChatColor.AQUA + cs.getSpawnRange());
+				sendValueMessage(player, "command.editspawner.spawnrange", cs.getSpawnRange());
 				return true;
 			}
 
@@ -54,8 +59,7 @@ public class EditSpawnerCommandExecutor implements CommandExecutor {
 					block.setBlockData(cs.getBlockData());
 
 				}
-				player.sendMessage(ChatColor.GOLD + "[SpawnerSilk] " + ChatColor.WHITE +
-						"SpawnCount value set to : " + ChatColor.AQUA + cs.getSpawnCount());
+				sendValueMessage(player, "command.editspawner.spawncount", cs.getSpawnCount());
 				return true;
 			}
 
@@ -67,8 +71,7 @@ public class EditSpawnerCommandExecutor implements CommandExecutor {
 					block.setBlockData(cs.getBlockData());
 				}
 
-				player.sendMessage(ChatColor.GOLD + "[SpawnerSilk] " + ChatColor.WHITE +
-						"MaxNearbyEntities value set to : " + ChatColor.AQUA + cs.getMaxNearbyEntities());
+				sendValueMessage(player, "command.editspawner.max_nearby_entities", cs.getMaxNearbyEntities());
 				return true;
 			}
 
@@ -80,8 +83,7 @@ public class EditSpawnerCommandExecutor implements CommandExecutor {
 					block.setBlockData(cs.getBlockData());
 				}
 
-				player.sendMessage(ChatColor.GOLD + "[SpawnerSilk] " + ChatColor.WHITE +
-						"RequiredPlayerRange value set to : " + ChatColor.AQUA + cs.getRequiredPlayerRange());
+				sendValueMessage(player, "command.editspawner.required_player_range", cs.getRequiredPlayerRange());
 				return true;
 			}
 
@@ -93,8 +95,7 @@ public class EditSpawnerCommandExecutor implements CommandExecutor {
 					block.setBlockData(cs.getBlockData());
 				}
 
-				player.sendMessage(ChatColor.GOLD + "[SpawnerSilk] " + ChatColor.WHITE +
-						"Delay value set to : " + ChatColor.AQUA + cs.getDelay());
+				sendValueMessage(player, "command.editspawner.delay", cs.getDelay());
 				return true;
 			}
 
@@ -106,8 +107,7 @@ public class EditSpawnerCommandExecutor implements CommandExecutor {
 					block.setBlockData(cs.getBlockData());
 				}
 
-				player.sendMessage(ChatColor.GOLD + "[SpawnerSilk] " + ChatColor.WHITE +
-						"MaxSpawnDelay value set to : " + ChatColor.AQUA + cs.getMaxSpawnDelay());
+				sendValueMessage(player, "command.editspawner.max_spawn_delay", cs.getMaxSpawnDelay());
 				return true;
 			}
 			/// MinSpawnDelay
@@ -118,17 +118,19 @@ public class EditSpawnerCommandExecutor implements CommandExecutor {
 					block.setBlockData(cs.getBlockData());
 				}
 
-				player.sendMessage(ChatColor.GOLD + "[SpawnerSilk] " + ChatColor.WHITE +
-						"MinSpawnDelay value set to : " + ChatColor.AQUA + cs.getMinSpawnDelay());
+				sendValueMessage(player, "command.editspawner.min_spawn_delay", cs.getMinSpawnDelay());
 				return true;
 			}
 
 		} else {
-			player.sendMessage(ChatColor.GOLD + "[SpawnerSilk] " + ChatColor.RED +
-					"You must look the spawner you want to edit");
+			player.sendMessage(plugin.getLocalization().getMessage("command.editspawner.must_target_spawner"));
 			return true;
 		}
 		return false;
+	}
+
+	private void sendValueMessage(Player player, String key, int value) {
+		player.sendMessage(plugin.getLocalization().getMessage(key, java.util.Collections.singletonMap("value", String.valueOf(value))));
 	}
 
 }

@@ -1,7 +1,6 @@
 package me.crylonz.spawnersilk.command;
 
 import me.crylonz.spawnersilk.SpawnerSilk;
-import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -21,9 +20,6 @@ public class SpawnerSilkCommandExecutor implements CommandExecutor {
 		this.editSpawnerCommandExecutor = editSpawnerCommandExecutor;
 	}
 
-	private final String UNKNOWN_COMMAND = "Unknown command";
-	private final String PLUGIN_RELOAD = "Plugin reloaded successfully !";
-
 	@Override
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
 		if (cmd.getName().equalsIgnoreCase("sps")) {
@@ -38,7 +34,7 @@ public class SpawnerSilkCommandExecutor implements CommandExecutor {
 					case "reload":
 						if (player == null || player.hasPermission("spawnerSilk.reload")) {
 							reloadPlugin();
-							displayMessage(player, PLUGIN_RELOAD, false);
+							displayMessage(player, "command.sps.reload.success");
 						}
 						break;
 					case "editspawner":
@@ -50,11 +46,11 @@ public class SpawnerSilkCommandExecutor implements CommandExecutor {
 							return giveSpawnerCommandExecutor.runCommand(player, reformatArgs(args, "givespawner"));
 						}
 					default:
-						displayMessage(player, UNKNOWN_COMMAND, true);
+						displayMessage(player, "command.sps.unknown");
 						break;
 				}
 			} else {
-				displayMessage(player, UNKNOWN_COMMAND, true);
+				displayMessage(player, "command.sps.unknown");
 			}
 		}
 		return true;
@@ -65,20 +61,12 @@ public class SpawnerSilkCommandExecutor implements CommandExecutor {
 		plugin.loadPluginConfig();
 	}
 
-	private void displayMessage(Player player, String message, boolean isError) {
-		String prefixMessage;
-
-		if (isError) {
-			prefixMessage = ChatColor.RED.toString();
-		} else {
-			prefixMessage = ChatColor.GREEN.toString();
-		}
-
-
+	private void displayMessage(Player player, String messageKey) {
+		String message = plugin.getLocalization().getMessage(messageKey);
 		if (player == null) {
-			SpawnerSilk.log.info("[SpawnerSilk] " + message);
+			SpawnerSilk.log.info(org.bukkit.ChatColor.stripColor(message));
 		} else {
-			player.sendMessage(prefixMessage + "[SpawnerSilk] " + message);
+			player.sendMessage(message);
 		}
 	}
 

@@ -21,6 +21,10 @@ need-silk-touch-to-destroy: false
 # false : Everybody can drop spawner
 need-silk-touch: true
 
+# Language used to load plugins/SpawnerSilk/localization/<language>.json
+# Only en_us is bundled for now
+language: en_us
+
 # 0 : Player can get spawner by breaking it no matter how
 # 1 : Player need to break the spawner with wooden pickaxe or better
 # 2 : Player need to break the spawner with stone pickaxe or better

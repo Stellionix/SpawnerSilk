@@ -13,6 +13,12 @@ import org.bukkit.inventory.ItemStack;
 
 public class GiveSpawnerCommandExecutor implements CommandExecutor {
 
+	private final SpawnerSilk plugin;
+
+	public GiveSpawnerCommandExecutor(SpawnerSilk plugin) {
+		this.plugin = plugin;
+	}
+
 	@Override
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
 		// if command is givespawner
@@ -38,13 +44,9 @@ public class GiveSpawnerCommandExecutor implements CommandExecutor {
 		Player player = null;
 		if ((sender instanceof Player))
 			player = (Player) sender;
-		String STR_INVALID_FORMAT = "[SpawnerSilk] BAD ARGUMENTS : Usage givespawner <Player> <SpawnerType> [Amount]";
+		String invalidFormatKey = "command.givespawner.usage.direct";
 		if (args == null) {
-			STR_INVALID_FORMAT = "[SpawnerSilk] BAD ARGUMENTS : Usage /sps givespawner <Player> <SpawnerType> [Amount]";
-			if (player != null)
-				player.sendMessage(ChatColor.RED + STR_INVALID_FORMAT);
-			else
-				SpawnerSilk.log.info(STR_INVALID_FORMAT);
+			sendMessage(player, "command.givespawner.usage.sps");
 			return true;
 		}
 		if ((player != null && player.hasPermission("spawnersilk.givespawner")) || (!(sender instanceof Player))) {
@@ -65,10 +67,7 @@ public class GiveSpawnerCommandExecutor implements CommandExecutor {
 						if (args[2].matches("-?(0|[1-9]\\d*)"))
 							amount = Integer.parseInt(args[2]);
 						else {
-							if (player != null)
-								player.sendMessage(ChatColor.RED + STR_INVALID_FORMAT);
-							else
-								SpawnerSilk.log.info(STR_INVALID_FORMAT);
+							sendMessage(player, invalidFormatKey);
 							return true;
 						}
 					}
@@ -78,37 +77,34 @@ public class GiveSpawnerCommandExecutor implements CommandExecutor {
 					// if the item is valid
 					if (is.getItemMeta() != null && SpawnerAPI.getEntityType(is) != EntityType.UNKNOWN) {
 						destinator.getInventory().addItem(is);
-						String STR_CMD_SUCCESSFULL = "[SpawnerSilk] Command done successful !";
-						if (player != null)
-							player.sendMessage(ChatColor.GREEN + STR_CMD_SUCCESSFULL);
-						else
-							SpawnerSilk.log.info(STR_CMD_SUCCESSFULL);
+						sendMessage(player, "command.givespawner.success");
 					}
 					// item not valid
 					else {
-						String STR_BAD_FORMAT = "[SpawnerSilk] Unknown type of spawner";
-						if (player != null)
-							player.sendMessage(ChatColor.RED + STR_BAD_FORMAT);
-						else
-							SpawnerSilk.log.info(STR_BAD_FORMAT);
+						sendMessage(player, "command.givespawner.invalid_type");
 					}
 
 					// destinator not valid
 				} else {
-					String STR_INVALID_PLAYER = "[SpawnerSilk] Player does not exist";
-					if (player != null)
-						player.sendMessage(ChatColor.RED + STR_INVALID_PLAYER);
-					else
-						SpawnerSilk.log.info(STR_INVALID_PLAYER);
+					sendMessage(player, "command.givespawner.invalid_player");
 				}
 
 				// not good argument structure
 			} else if (player != null)
-				player.sendMessage(ChatColor.RED + STR_INVALID_FORMAT);
+				sendMessage(player, invalidFormatKey);
 			else
-				SpawnerSilk.log.info(STR_INVALID_FORMAT);
+				sendMessage(null, invalidFormatKey);
 		}
 		return true;
+	}
+
+	private void sendMessage(Player player, String key) {
+		String message = plugin.getLocalization().getMessage(key);
+		if (player != null) {
+			player.sendMessage(message);
+		} else {
+			SpawnerSilk.log.info(ChatColor.stripColor(message));
+		}
 	}
 
 

@@ -34,10 +34,10 @@ repositories {
 
 dependencies {
     compileOnly("org.spigotmc:spigot-api:1.21.1-R0.1-SNAPSHOT")
-    compileOnly("com.googlecode.json-simple:json-simple:1.1.1")
     compileOnly("com.sk89q.worldguard:worldguard-bukkit:7.0.5-SNAPSHOT")
     compileOnly("com.github.brcdev-minecraft:shopgui-api:3.2.0")
     implementation("org.bstats:bstats-bukkit:2.2.1")
+    implementation("com.googlecode.json-simple:json-simple:1.1.1")
 
     testImplementation("org.spigotmc:spigot-api:1.21.1-R0.1-SNAPSHOT")
     testImplementation("com.github.brcdev-minecraft:shopgui-api:3.2.0")

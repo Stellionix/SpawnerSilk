@@ -1,0 +1,20 @@
+{
+  "command.sps.reload.success": "&a[SpawnerSilk] Plugin reloaded successfully!",
+  "command.sps.unknown": "&c[SpawnerSilk] Unknown command",
+  "command.givespawner.usage.direct": "&c[SpawnerSilk] Bad arguments: Usage /givespawner <Player> <SpawnerType> [Amount]",
+  "command.givespawner.usage.sps": "&c[SpawnerSilk] Bad arguments: Usage /sps givespawner <Player> <SpawnerType> [Amount]",
+  "command.givespawner.success": "&a[SpawnerSilk] Command completed successfully!",
+  "command.givespawner.invalid_type": "&c[SpawnerSilk] Unknown type of spawner",
+  "command.givespawner.invalid_player": "&c[SpawnerSilk] Player does not exist",
+  "command.editspawner.spawnrange": "&6[SpawnerSilk] &fSpawnRange value set to : &b{value}",
+  "command.editspawner.spawncount": "&6[SpawnerSilk] &fSpawnCount value set to : &b{value}",
+  "command.editspawner.max_nearby_entities": "&6[SpawnerSilk] &fMaxNearbyEntities value set to : &b{value}",
+  "command.editspawner.required_player_range": "&6[SpawnerSilk] &fRequiredPlayerRange value set to : &b{value}",
+  "command.editspawner.delay": "&6[SpawnerSilk] &fDelay value set to : &b{value}",
+  "command.editspawner.max_spawn_delay": "&6[SpawnerSilk] &fMaxSpawnDelay value set to : &b{value}",
+  "command.editspawner.min_spawn_delay": "&6[SpawnerSilk] &fMinSpawnDelay value set to : &b{value}",
+  "command.editspawner.must_target_spawner": "&6[SpawnerSilk] &cYou must look at the spawner you want to edit",
+  "listener.anvil.spawner_denied": "&cYou can't put that in an anvil",
+  "plugin.shopgui.enabled": "ShopGUI+ support enabled",
+  "plugin.shopgui.disabled": "ShopGUI+ support disabled"
+}

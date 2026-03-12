@@ -1,8 +1,16 @@
 package me.crylonz.spawnersilk.utils;
 
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -14,6 +22,7 @@ public class SpawnerSilkConfig {
     public static final String AUTO_UPDATE = "auto-update";
     public static final String NEED_SILK_TOUCH_TO_DESTROY = "need-silk-touch-to-destroy";
     public static final String NEED_SILK_TOUCH = "need-silk-touch";
+    public static final String LANGUAGE = "language";
     public static final String PICKAXE_MODE = "pickaxe-mode";
     public static final String DROP_MODE = "drop-mode";
     public static final String DROP_CHANCE = "drop-chance";
@@ -36,15 +45,24 @@ public class SpawnerSilkConfig {
     }
 
     public void load() {
-        plugin.saveDefaultConfig();
-        FileConfiguration config = plugin.getConfig();
+        File configFile = new File(plugin.getDataFolder(), "config.yml");
+        if (!configFile.exists()) {
+            plugin.saveDefaultConfig();
+        }
 
-        applyDefaults(config);
-        migrateLegacyKeys(config);
-        validateAndNormalize(config);
+        FileConfiguration existingConfig = YamlConfiguration.loadConfiguration(configFile);
+        migrateLegacyKeys(existingConfig);
 
-        config.options().copyDefaults(true);
-        plugin.saveConfig();
+        YamlConfiguration mergedConfig = loadDefaultTemplate();
+        mergeKnownValues(mergedConfig, existingConfig);
+        validateAndNormalize(mergedConfig);
+
+        try {
+            mergedConfig.save(configFile);
+        } catch (IOException e) {
+            throw new IllegalStateException("Unable to save config.yml", e);
+        }
+
         plugin.reloadConfig();
     }
 
@@ -64,27 +82,26 @@ public class SpawnerSilkConfig {
         return getConfiguration().getInt(resolveKey(key));
     }
 
+    public String getString(String key) {
+        return getConfiguration().getString(resolveKey(key));
+    }
+
     public FileConfiguration getConfiguration() {
         return plugin.getConfig();
     }
 
-    private void applyDefaults(FileConfiguration config) {
-        config.addDefault(AUTO_UPDATE, true);
-        config.addDefault(NEED_SILK_TOUCH_TO_DESTROY, false);
-        config.addDefault(NEED_SILK_TOUCH, true);
-        config.addDefault(PICKAXE_MODE, 5);
-        config.addDefault(DROP_MODE, 0);
-        config.addDefault(DROP_CHANCE, 100);
-        config.addDefault(DROP_EGG_CHANCE, 100);
-        config.addDefault(EXPLOSION_DROP_CHANCE, 10);
-        config.addDefault(SPAWNERS_CAN_BE_MODIFIED_BY_EGG, true);
-        config.addDefault(DROP_TO_INVENTORY, false);
-        config.addDefault(USE_EGG, true);
-        config.addDefault(DROP_IN_CREATIVE, false);
-        config.addDefault(SPAWNERS_GENERATE_XP, false);
-        config.addDefault(SPAWNER_OVERLAY, true);
-        config.addDefault(SPAWNER_OVERLAY_DELAY, 10);
-        config.addDefault(BLACKLIST, Arrays.asList("BOAT_SPAWNER"));
+    private YamlConfiguration loadDefaultTemplate() {
+        try (InputStream inputStream = plugin.getResource("config.yml")) {
+            if (inputStream == null) {
+                throw new IOException("Missing embedded config.yml");
+            }
+
+            try (Reader reader = new InputStreamReader(inputStream, StandardCharsets.UTF_8)) {
+                return YamlConfiguration.loadConfiguration(reader);
+            }
+        } catch (IOException e) {
+            throw new IllegalStateException("Unable to read embedded config.yml", e);
+        }
     }
 
     private void migrateLegacyKeys(FileConfiguration config) {
@@ -100,7 +117,21 @@ public class SpawnerSilkConfig {
         }
     }
 
+    private void mergeKnownValues(YamlConfiguration targetConfig, FileConfiguration existingConfig) {
+        for (String key : targetConfig.getKeys(true)) {
+            if (isSection(targetConfig, key)) {
+                continue;
+            }
+
+            String sourceKey = resolveLegacySourceKey(existingConfig, key);
+            if (sourceKey != null && existingConfig.isSet(sourceKey)) {
+                targetConfig.set(key, existingConfig.get(sourceKey));
+            }
+        }
+    }
+
     private void validateAndNormalize(FileConfiguration config) {
+        normalizeLocale(config, LANGUAGE, "en_us");
         normalizeInt(config, PICKAXE_MODE, 5, 0, 6);
         normalizeInt(config, DROP_MODE, 0, 0, 1);
         normalizeInt(config, DROP_CHANCE, 100, 0, 100);
@@ -108,6 +139,17 @@ public class SpawnerSilkConfig {
         normalizeInt(config, EXPLOSION_DROP_CHANCE, 10, 0, 100);
         normalizeInt(config, SPAWNER_OVERLAY_DELAY, 10, 3, Integer.MAX_VALUE);
         normalizeUppercaseList(config, BLACKLIST, Arrays.asList("BOAT_SPAWNER"));
+    }
+
+    private void normalizeLocale(FileConfiguration config, String key, String defaultValue) {
+        String value = config.getString(key);
+        if (value == null || value.trim().isEmpty()) {
+            config.set(key, defaultValue);
+            plugin.getLogger().warning("Config key '" + key + "' is invalid. Reset to " + defaultValue);
+            return;
+        }
+
+        config.set(key, value.trim().toLowerCase(Locale.ROOT));
     }
 
     private void normalizeInt(FileConfiguration config, String key, int defaultValue, int min, int max) {
@@ -158,5 +200,17 @@ public class SpawnerSilkConfig {
             return BLACKLIST;
         }
         return key;
+    }
+
+    private String resolveLegacySourceKey(FileConfiguration config, String key) {
+        if (BLACKLIST.equals(key) && config.contains(LEGACY_BLACKLIST)) {
+            return LEGACY_BLACKLIST;
+        }
+        return key;
+    }
+
+    private boolean isSection(ConfigurationSection configurationSection, String key) {
+        Object value = configurationSection.get(key);
+        return value instanceof ConfigurationSection;
     }
 }

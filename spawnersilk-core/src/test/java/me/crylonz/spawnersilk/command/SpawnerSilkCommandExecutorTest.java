@@ -1,6 +1,7 @@
 package me.crylonz.spawnersilk.command;
 
 import me.crylonz.spawnersilk.SpawnerSilk;
+import me.crylonz.spawnersilk.utils.LocalizationManager;
 import org.bukkit.command.Command;
 import org.bukkit.entity.Player;
 import org.junit.jupiter.api.Test;
@@ -15,12 +16,15 @@ class SpawnerSilkCommandExecutorTest {
     @Test
     void reloadSubcommandReloadsPluginAndNotifiesPlayer() {
         SpawnerSilk plugin = mock(SpawnerSilk.class);
+        LocalizationManager localization = mock(LocalizationManager.class);
         GiveSpawnerCommandExecutor giveSpawner = mock(GiveSpawnerCommandExecutor.class);
         EditSpawnerCommandExecutor editSpawner = mock(EditSpawnerCommandExecutor.class);
         SpawnerSilkCommandExecutor executor = new SpawnerSilkCommandExecutor(plugin, giveSpawner, editSpawner);
         Player player = mock(Player.class);
         Command command = mock(Command.class);
 
+        when(plugin.getLocalization()).thenReturn(localization);
+        when(localization.getMessage("command.sps.reload.success")).thenReturn("[SpawnerSilk] Plugin reloaded successfully!");
         when(command.getName()).thenReturn("sps");
         when(player.hasPermission("spawnerSilk.reload")).thenReturn(true);
 
@@ -36,12 +40,14 @@ class SpawnerSilkCommandExecutorTest {
     @Test
     void editSpawnerSubcommandDelegatesWithTrimmedArgs() {
         SpawnerSilk plugin = mock(SpawnerSilk.class);
+        LocalizationManager localization = mock(LocalizationManager.class);
         GiveSpawnerCommandExecutor giveSpawner = mock(GiveSpawnerCommandExecutor.class);
         EditSpawnerCommandExecutor editSpawner = mock(EditSpawnerCommandExecutor.class);
         SpawnerSilkCommandExecutor executor = new SpawnerSilkCommandExecutor(plugin, giveSpawner, editSpawner);
         Player player = mock(Player.class);
         Command command = mock(Command.class);
 
+        when(plugin.getLocalization()).thenReturn(localization);
         when(command.getName()).thenReturn("sps");
         when(editSpawner.runCommand(player, new String[]{"delay", "20"})).thenReturn(true);
 
@@ -55,12 +61,15 @@ class SpawnerSilkCommandExecutorTest {
     @Test
     void unknownSubcommandShowsErrorToPlayer() {
         SpawnerSilk plugin = mock(SpawnerSilk.class);
+        LocalizationManager localization = mock(LocalizationManager.class);
         GiveSpawnerCommandExecutor giveSpawner = mock(GiveSpawnerCommandExecutor.class);
         EditSpawnerCommandExecutor editSpawner = mock(EditSpawnerCommandExecutor.class);
         SpawnerSilkCommandExecutor executor = new SpawnerSilkCommandExecutor(plugin, giveSpawner, editSpawner);
         Player player = mock(Player.class);
         Command command = mock(Command.class);
 
+        when(plugin.getLocalization()).thenReturn(localization);
+        when(localization.getMessage("command.sps.unknown")).thenReturn("[SpawnerSilk] Unknown command");
         when(command.getName()).thenReturn("sps");
 
         boolean result = executor.onCommand(player, command, "sps", new String[]{"unknown"});
@@ -73,11 +82,13 @@ class SpawnerSilkCommandExecutorTest {
     @Test
     void nonPlayerCannotExecutePlayerOnlySubcommands() {
         SpawnerSilk plugin = mock(SpawnerSilk.class);
+        LocalizationManager localization = mock(LocalizationManager.class);
         GiveSpawnerCommandExecutor giveSpawner = mock(GiveSpawnerCommandExecutor.class);
         EditSpawnerCommandExecutor editSpawner = mock(EditSpawnerCommandExecutor.class);
         SpawnerSilkCommandExecutor executor = new SpawnerSilkCommandExecutor(plugin, giveSpawner, editSpawner);
         Command command = mock(Command.class);
 
+        when(plugin.getLocalization()).thenReturn(localization);
         when(command.getName()).thenReturn("sps");
 
         boolean result = executor.onCommand(mock(org.bukkit.command.CommandSender.class), command, "sps", new String[]{"givespawner", "Alex"});

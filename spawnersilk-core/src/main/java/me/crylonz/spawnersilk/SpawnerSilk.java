@@ -5,6 +5,7 @@ import me.crylonz.spawnersilk.command.GiveSpawnerCommandExecutor;
 import me.crylonz.spawnersilk.command.SpawnerSilkCommandExecutor;
 import me.crylonz.spawnersilk.command.SpawnerSilkTabCompletion;
 import me.crylonz.spawnersilk.external.ShopGuiPlus;
+import me.crylonz.spawnersilk.utils.LocalizationManager;
 import me.crylonz.spawnersilk.utils.SpawnerSilkConfig;
 import me.crylonz.spawnersilk.utils.SpawnerSilkUpdater;
 import org.bstats.bukkit.Metrics;
@@ -26,8 +27,8 @@ public class SpawnerSilk extends JavaPlugin implements Listener {
     public static final Logger log = Logger.getLogger("Minecraft");
     public static HashMap<String, String> playersUUID = new HashMap<>();
     private SpawnerSilkProvider spawnerProvider;
-    public File configFile = new File(getDataFolder(), "config.yml");
     public SpawnerSilkConfig config = new SpawnerSilkConfig(this);
+    private final LocalizationManager localization = new LocalizationManager(this);
 
     @Override
     public void onEnable() {
@@ -37,8 +38,8 @@ public class SpawnerSilk extends JavaPlugin implements Listener {
 
         Metrics metrics = new Metrics(this, 5536);
 
-        GiveSpawnerCommandExecutor giveSpawnerCommandExecutor = new GiveSpawnerCommandExecutor();
-        EditSpawnerCommandExecutor editSpawnerCommandExecutor = new EditSpawnerCommandExecutor();
+        GiveSpawnerCommandExecutor giveSpawnerCommandExecutor = new GiveSpawnerCommandExecutor(this);
+        EditSpawnerCommandExecutor editSpawnerCommandExecutor = new EditSpawnerCommandExecutor(this);
 
         this.getCommand("givespawner").setExecutor(giveSpawnerCommandExecutor);
         this.getCommand("editspawner").setExecutor(editSpawnerCommandExecutor);
@@ -48,21 +49,21 @@ public class SpawnerSilk extends JavaPlugin implements Listener {
         Objects.requireNonNull(getCommand("editspawner")).setTabCompleter(new SpawnerSilkTabCompletion());
         Objects.requireNonNull(getCommand("sps")).setTabCompleter(new SpawnerSilkTabCompletion());
 
+        loadPluginConfig();
+
         if (Bukkit.getPluginManager().getPlugin("ShopGUIPlus") != null) {
             this.spawnerProvider = new SpawnerSilkProvider();
             ShopGuiPlus.hookIntoShopGui(spawnerProvider, this.getLogger());
-            this.getLogger().info("ShopGUI+ support enabled");
+            this.getLogger().info(localization.getMessage("plugin.shopgui.enabled"));
         }  else {
-            this.getLogger().info("ShopGUI+ support disabled");
+            this.getLogger().info(localization.getMessage("plugin.shopgui.disabled"));
         }
 
         for (Player play : Bukkit.getOnlinePlayers()) {
             playersUUID.put(play.getName(), play.getUniqueId().toString());
         }
 
-        loadPluginConfig();
-
-        if (config.getBoolean("auto-update")) {
+        if (config.getBoolean(SpawnerSilkConfig.AUTO_UPDATE)) {
             SpawnerSilkUpdater updater = new SpawnerSilkUpdater(this, 322295, this.getFile(), SpawnerSilkUpdater.UpdateType.DEFAULT, true);
         }
     }
@@ -78,6 +79,11 @@ public class SpawnerSilk extends JavaPlugin implements Listener {
 
     public void loadPluginConfig() {
         config.load();
+        localization.load();
+    }
+
+    public LocalizationManager getLocalization() {
+        return localization;
     }
 
     public static Material getSpawnerMaterial() {

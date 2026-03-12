@@ -2,6 +2,7 @@ package me.crylonz.spawnersilk;
 
 import me.crylonz.spawnersilk.utils.ArmorStandCleaner;
 import me.crylonz.spawnersilk.utils.SpawnerSilkHologram;
+import me.crylonz.spawnersilk.utils.SpawnerSilkConfig;
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
@@ -61,19 +62,19 @@ public class SpawnerSilkListener implements Listener {
                 Player p = e.getPlayer();
 
                 if (!p.getInventory().getItemInMainHand().getEnchantments().containsKey(Enchantment.SILK_TOUCH)
-                        && plugin.getDataConfig().getBoolean("need-silk-touch-to-destroy")) {
+                        && plugin.getDataConfig().getBoolean(SpawnerSilkConfig.NEED_SILK_TOUCH_TO_DESTROY)) {
                     e.setCancelled(true);
                 }
 
                 if ((p.getInventory().getItemInMainHand().getEnchantments().containsKey(Enchantment.SILK_TOUCH)
-                        || !plugin.getDataConfig().getBoolean("need-silk-touch")) && canGetSpawner(p)) {
+                        || !plugin.getDataConfig().getBoolean(SpawnerSilkConfig.NEED_SILK_TOUCH)) && canGetSpawner(p)) {
 
                     int randomSpawnerDrop = new Random().nextInt(100);
                     int randomEggDrop = new Random().nextInt(100);
 
                     dropToPlayer(e,
-                            plugin.getDataConfig().getInt("drop-chance") >= randomSpawnerDrop,
-                            plugin.getDataConfig().getInt("drop-egg-chance") >= randomEggDrop);
+                            plugin.getDataConfig().getInt(SpawnerSilkConfig.DROP_CHANCE) >= randomSpawnerDrop,
+                            plugin.getDataConfig().getInt(SpawnerSilkConfig.DROP_EGG_CHANCE) >= randomEggDrop);
                 }
             }
         }
@@ -85,18 +86,18 @@ public class SpawnerSilkListener implements Listener {
         ItemStack spawnerItem = SpawnerAPI.getSpawner(entity);
 
         if (plugin.getDataConfig()
-                .getList("blacklist")
+                .getList(SpawnerSilkConfig.BLACKLIST)
                 .stream()
                 .anyMatch(bannedEntity -> bannedEntity.toUpperCase().contains(entity.name().toUpperCase()))) {
             return;
         }
 
-        if (!plugin.getDataConfig().getBoolean("spawners-generate-xp")) {
+        if (!plugin.getDataConfig().getBoolean(SpawnerSilkConfig.SPAWNERS_GENERATE_XP)) {
             e.setExpToDrop(0);
         }
 
-        int dropMode = plugin.getDataConfig().getInt("drop-mode");
-        boolean dropInCreative = plugin.getDataConfig().getBoolean("drop-in-creative");
+        int dropMode = plugin.getDataConfig().getInt(SpawnerSilkConfig.DROP_MODE);
+        boolean dropInCreative = plugin.getDataConfig().getBoolean(SpawnerSilkConfig.DROP_IN_CREATIVE);
 
         if (e.getPlayer().getGameMode() == GameMode.CREATIVE && !dropInCreative) {
             return;
@@ -104,7 +105,7 @@ public class SpawnerSilkListener implements Listener {
 
         if (dropMode == 1) {
 
-            if (plugin.getDataConfig().getBoolean("drop-to-inventory") && e.getPlayer().getInventory().firstEmpty() != -1) {
+            if (plugin.getDataConfig().getBoolean(SpawnerSilkConfig.DROP_TO_INVENTORY) && e.getPlayer().getInventory().firstEmpty() != -1) {
 
                 if (dropSpawner) {
                     e.getPlayer().getInventory().addItem(new ItemStack(Material.SPAWNER));
@@ -126,7 +127,7 @@ public class SpawnerSilkListener implements Listener {
         }
         // Drop Mode 0
         else {
-            if (plugin.getDataConfig().getBoolean("drop-to-inventory") && e.getPlayer().getInventory().firstEmpty() != -1) {
+            if (plugin.getDataConfig().getBoolean(SpawnerSilkConfig.DROP_TO_INVENTORY) && e.getPlayer().getInventory().firstEmpty() != -1) {
                 if (dropSpawner) {
                     e.getPlayer().getInventory().addItem(spawnerItem);
                 }
@@ -139,7 +140,7 @@ public class SpawnerSilkListener implements Listener {
     }
 
     public boolean canGetSpawner(Player p) {
-        int mode = plugin.getDataConfig().getInt("pickaxe-mode");
+        int mode = plugin.getDataConfig().getInt(SpawnerSilkConfig.PICKAXE_MODE);
         boolean valid = mode == 0;
         if (mode <= 1 && !valid) {
             valid = p.getInventory().getItemInMainHand().getType() == Material.WOODEN_PICKAXE;
@@ -182,7 +183,7 @@ public class SpawnerSilkListener implements Listener {
     public void playerRenameItem(InventoryClickEvent event) {
         if (event.getInventory().getType().equals(InventoryType.ANVIL)) {
             if (event.getCurrentItem() != null && event.getCurrentItem().getType() == getSpawnerMaterial()) {
-                event.getWhoClicked().sendMessage(ChatColor.RED + " You can't put that in an anvil");
+                event.getWhoClicked().sendMessage(plugin.getLocalization().getMessage("listener.anvil.spawner_denied"));
                 event.setResult(Event.Result.DENY);
             }
         }
@@ -190,14 +191,14 @@ public class SpawnerSilkListener implements Listener {
 
     @EventHandler
     public void onPlayerInteractEvent(PlayerInteractEvent e) {
-        if (!plugin.getDataConfig().getBoolean("spawners-can-be-modified-by-egg")) {
+        if (!plugin.getDataConfig().getBoolean(SpawnerSilkConfig.SPAWNERS_CAN_BE_MODIFIED_BY_EGG)) {
             if (e.getAction() == Action.RIGHT_CLICK_BLOCK) {
                 if (e.getClickedBlock() != null && e.getClickedBlock().getType() == getSpawnerMaterial()) {
                     e.setCancelled(true);
                 }
             }
         } else {
-            if (!plugin.getDataConfig().getBoolean("use-egg") && e.getItem() != null &&
+            if (!plugin.getDataConfig().getBoolean(SpawnerSilkConfig.USE_EGG) && e.getItem() != null &&
                     e.getPlayer().getTargetBlock(null, 5).getType() == getSpawnerMaterial() &&
                     e.getItem().getType().name().toUpperCase().contains("EGG")) {
                 e.setCancelled(true);
@@ -210,7 +211,7 @@ public class SpawnerSilkListener implements Listener {
 
     @EventHandler
     public void onPlayerMove(PlayerMoveEvent e) {
-        if (plugin.getDataConfig().getBoolean("spawner-overlay") && e.getPlayer().hasPermission("spawnersilk.overlay")) {
+        if (plugin.getDataConfig().getBoolean(SpawnerSilkConfig.SPAWNER_OVERLAY) && e.getPlayer().hasPermission("spawnersilk.overlay")) {
             Block block = e.getPlayer().getTargetBlockExact(10);
 
             // Player look at a spawner
@@ -234,7 +235,7 @@ public class SpawnerSilkListener implements Listener {
                     armorStands.add(SpawnerSilkHologram.generateHologram(cs.getLocation(), ChatColor.GREEN + "Max Spawn Delay " + ChatColor.WHITE + cs.getMaxSpawnDelay(), 0.5f, -0.95f, 0.5f, this.plugin, e.getPlayer().getUniqueId()));
                     armorStands.add(SpawnerSilkHologram.generateHologram(cs.getLocation(), ChatColor.GREEN + "Min Spawn Delay " + ChatColor.WHITE + cs.getMinSpawnDelay(), 0.5f, -1.2f, 0.5f, this.plugin, e.getPlayer().getUniqueId()));
 
-                    getServer().getScheduler().scheduleSyncDelayedTask(this.plugin, new ArmorStandCleaner(armorStands), 20L * plugin.getDataConfig().getInt("spawner-overlay-delay"));
+                    getServer().getScheduler().scheduleSyncDelayedTask(this.plugin, new ArmorStandCleaner(armorStands), 20L * plugin.getDataConfig().getInt(SpawnerSilkConfig.SPAWNER_OVERLAY_DELAY));
 
                 }
             }
@@ -248,7 +249,7 @@ public class SpawnerSilkListener implements Listener {
         if (e.blockList().size() > 0) {
             for (int i = 0; i < e.blockList().size(); i++) {
                 Block block = e.blockList().get(i);
-                if (block.getType() == getSpawnerMaterial() && randomInt <= plugin.getDataConfig().getInt("explosion-drop-chance")) {
+                if (block.getType() == getSpawnerMaterial() && randomInt <= plugin.getDataConfig().getInt(SpawnerSilkConfig.EXPLOSION_DROP_CHANCE)) {
                     CreatureSpawner s = (CreatureSpawner) block.getState();
                     block.getWorld().dropItemNaturally(block.getLocation(), SpawnerAPI.getSpawner(s.getSpawnedType()));
                 }
