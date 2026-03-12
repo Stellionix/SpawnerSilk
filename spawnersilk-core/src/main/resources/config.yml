@@ -74,7 +74,7 @@ spawner-overlay-delay: 10
 
 # You can put spawners that you don't want droppable in this list. The name is the entity name in uppercase (ex BEE).
 # In case of space in the name just put an _ (ex : ZOMBIE_HORSE)
-black-list:
+blacklist:
   - 'BOAT_SPAWNER'
 
 

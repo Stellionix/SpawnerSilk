@@ -28,7 +28,7 @@ class SpawnerSilkCommandExecutorTest {
 
         assertTrue(result);
         verify(plugin).reloadConfig();
-        verify(plugin).registerConfig();
+        verify(plugin).loadPluginConfig();
         verify(player).sendMessage(argThat((String message) -> message.contains("Plugin reloaded successfully")));
         verifyNoSubcommandsWereCalled(giveSpawner, editSpawner);
     }

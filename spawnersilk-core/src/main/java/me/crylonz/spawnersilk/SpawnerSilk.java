@@ -16,7 +16,6 @@ import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Objects;
 import java.util.logging.Logger;
@@ -28,8 +27,6 @@ public class SpawnerSilk extends JavaPlugin implements Listener {
     public static HashMap<String, String> playersUUID = new HashMap<>();
     private SpawnerSilkProvider spawnerProvider;
     public File configFile = new File(getDataFolder(), "config.yml");
-
-    //config data
     public SpawnerSilkConfig config = new SpawnerSilkConfig(this);
 
     @Override
@@ -63,13 +60,7 @@ public class SpawnerSilk extends JavaPlugin implements Listener {
             playersUUID.put(play.getName(), play.getUniqueId().toString());
         }
 
-        registerConfig();
-
-        if (!configFile.exists()) {
-            saveDefaultConfig();
-        } else {
-            config.updateConfig();
-        }
+        loadPluginConfig();
 
         if (config.getBoolean("auto-update")) {
             SpawnerSilkUpdater updater = new SpawnerSilkUpdater(this, 322295, this.getFile(), SpawnerSilkUpdater.UpdateType.DEFAULT, true);
@@ -81,28 +72,12 @@ public class SpawnerSilk extends JavaPlugin implements Listener {
 
     }
 
-    public void registerConfig() {
-        config.register("auto-update", true);
-        config.register("need-silk-touch-to-destroy", false);
-        config.register("need-silk-touch", true);
-        config.register("pickaxe-mode", 5);
-        config.register("drop-chance", 100);
-        config.register("drop-egg-chance", 100);
-        config.register("drop-mode", 0);
-        config.register("explosion-drop-chance", 10);
-        config.register("spawners-can-be-modified-by-egg", true);
-        config.register("drop-to-inventory", false);
-        config.register("use-egg", true);
-        config.register("drop-in-creative", false);
-        config.register("spawners-generate-xp", false);
-        config.register("spawners-generate-xp", false);
-        config.register("spawner-overlay", true);
-        config.register("spawner-overlay-delay", 10);
-        config.register("black-list", Collections.singleton("BOAT"));
-    }
-
     public SpawnerSilkConfig getDataConfig() {
         return config;
+    }
+
+    public void loadPluginConfig() {
+        config.load();
     }
 
     public static Material getSpawnerMaterial() {

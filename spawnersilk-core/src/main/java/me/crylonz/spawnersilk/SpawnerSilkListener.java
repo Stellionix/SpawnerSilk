@@ -85,7 +85,7 @@ public class SpawnerSilkListener implements Listener {
         ItemStack spawnerItem = SpawnerAPI.getSpawner(entity);
 
         if (plugin.getDataConfig()
-                .getList("black-list")
+                .getList("blacklist")
                 .stream()
                 .anyMatch(bannedEntity -> bannedEntity.toUpperCase().contains(entity.name().toUpperCase()))) {
             return;

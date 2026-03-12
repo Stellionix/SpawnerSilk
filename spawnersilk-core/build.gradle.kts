@@ -36,9 +36,11 @@ dependencies {
     compileOnly("org.spigotmc:spigot-api:1.21.1-R0.1-SNAPSHOT")
     compileOnly("com.googlecode.json-simple:json-simple:1.1.1")
     compileOnly("com.sk89q.worldguard:worldguard-bukkit:7.0.5-SNAPSHOT")
+    compileOnly("com.github.brcdev-minecraft:shopgui-api:3.2.0")
     implementation("org.bstats:bstats-bukkit:2.2.1")
 
     testImplementation("org.spigotmc:spigot-api:1.21.1-R0.1-SNAPSHOT")
+    testImplementation("com.github.brcdev-minecraft:shopgui-api:3.2.0")
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.9.1")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.9.1")
     testImplementation("org.mockito:mockito-core:4.11.0")
@@ -54,9 +56,6 @@ tasks.withType<ShadowJar> {
     archiveFileName.set("spawner-silk-SNAPSHOT.jar")
 }
 
-val spaceUsername: String by project
-val spacePassword: String by project
-
 publishing {
     publications {
         create<MavenPublication>("maven") {
@@ -64,16 +63,6 @@ publishing {
             artifactId = "spawner-silk"
             version = "5.6.0-SNAPSHOT"
             from(components["java"])
-        }
-    }
-    repositories {
-        maven {
-            url = uri("https://maven.pkg.jetbrains.space/openbeam/p/minecraft-projects/plugins-artifacts")
-            credentials {
-                username = System.getenv("JB_SPACE_CLIENT_ID")
-                password = System.getenv("JB_SPACE_CLIENT_SECRET")
-            }
-
         }
     }
 }

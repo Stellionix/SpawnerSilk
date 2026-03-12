@@ -62,7 +62,7 @@ public class SpawnerSilkCommandExecutor implements CommandExecutor {
 
 	private void reloadPlugin() {
 		plugin.reloadConfig();
-		plugin.registerConfig();
+		plugin.loadPluginConfig();
 	}
 
 	private void displayMessage(Player player, String message, boolean isError) {
