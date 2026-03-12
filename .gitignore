@@ -27,3 +27,5 @@ hs_err_pid*
 /META-INF/
 /out/artifacts/
 /dependency-reduced-pom.xml
+/spawnersilk-core/build/
+/.gradle/
