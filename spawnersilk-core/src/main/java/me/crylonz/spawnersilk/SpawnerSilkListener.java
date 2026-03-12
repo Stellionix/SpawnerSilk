@@ -224,6 +224,8 @@ public class SpawnerSilkListener implements Listener {
 
                     ArrayList<ArmorStand> armorStands = new ArrayList<>();
 
+                    cs.getChunk().setForceLoaded(true);
+
                     armorStands.add(SpawnerSilkHologram.generateHologram(cs.getLocation(), ChatColor.GOLD + "-- " + cs.getSpawnedType() + " Spawner --", 0.5f, 0.40f, 0.5f, this.plugin, e.getPlayer().getUniqueId()));
                     armorStands.add(SpawnerSilkHologram.generateHologram(cs.getLocation(), ChatColor.GREEN + "Spawn Count " + ChatColor.WHITE + cs.getSpawnCount(), 0.5f, 0.05f, 0.5f, this.plugin, e.getPlayer().getUniqueId()));
                     armorStands.add(SpawnerSilkHologram.generateHologram(cs.getLocation(), ChatColor.GREEN + "Spawn Range " + ChatColor.WHITE + cs.getSpawnRange(), 0.5f, -0.20f, 0.5f, this.plugin, e.getPlayer().getUniqueId()));
