@@ -33,14 +33,20 @@ repositories {
 }
 
 dependencies {
-    compileOnly("org.spigotmc:spigot-api:1.20.1-R0.1-SNAPSHOT")
+    compileOnly("org.spigotmc:spigot-api:1.21.1-R0.1-SNAPSHOT")
     compileOnly("com.googlecode.json-simple:json-simple:1.1.1")
     compileOnly("com.sk89q.worldguard:worldguard-bukkit:7.0.5-SNAPSHOT")
-    compileOnly("com.github.brcdev-minecraft:shopgui-api:1.0.1")
-
     implementation("org.bstats:bstats-bukkit:2.2.1")
 
-    testImplementation("org.junit.jupiter:junit-jupiter-engine:5.9.1")
+    testImplementation("org.spigotmc:spigot-api:1.21.1-R0.1-SNAPSHOT")
+    testImplementation("org.junit.jupiter:junit-jupiter-api:5.9.1")
+    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.9.1")
+    testImplementation("org.mockito:mockito-core:4.11.0")
+    testImplementation("org.mockito:mockito-inline:4.11.0")
+}
+
+tasks.test {
+    useJUnitPlatform()
 }
 
 tasks.withType<ShadowJar> {
