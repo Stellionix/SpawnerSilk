@@ -66,6 +66,9 @@ nav:
       - Installation: installation.md
   - Administration:
       - Configuration: configuration.md
+      - Localization: localization.md
+      - Player Feedback and Overlay: player-feedback-and-overlay.md
+      - Integrations: integrations.md
       - Commands and Permissions: commands-and-perms.md
       - Troubleshooting: troubleshooting.md
   - Developer:
