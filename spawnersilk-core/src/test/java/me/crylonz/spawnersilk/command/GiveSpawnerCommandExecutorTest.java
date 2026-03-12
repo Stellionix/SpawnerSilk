@@ -19,6 +19,8 @@ import java.util.Collections;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.anyMap;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.verify;
@@ -75,7 +77,7 @@ class GiveSpawnerCommandExecutorTest {
 
             assertTrue(executor.runCommand(sender, new String[]{"Alex", "ZOMBIE"}));
 
-            verify(sender).sendMessage("command.givespawner.invalid_player");
+            verify(sender).sendMessage("command.givespawner.invalid_player:Alex");
         }
     }
 
@@ -100,7 +102,7 @@ class GiveSpawnerCommandExecutorTest {
 
             assertTrue(executor.runCommand(sender, new String[]{"Alex", "BAD"}));
 
-            verify(sender).sendMessage("command.givespawner.invalid_type");
+            verify(sender).sendMessage("command.givespawner.invalid_type:BAD");
         }
     }
 
@@ -114,6 +116,7 @@ class GiveSpawnerCommandExecutorTest {
         ItemStack itemStack = mock(ItemStack.class);
 
         when(sender.hasPermission("spawnersilk.givespawner")).thenReturn(true);
+        when(target.getName()).thenReturn("Alex");
         when(target.getUniqueId()).thenReturn(UUID.randomUUID());
         when(target.getInventory()).thenReturn(inventory);
         when(itemStack.getItemMeta()).thenReturn(mock(org.bukkit.inventory.meta.ItemMeta.class));
@@ -128,7 +131,7 @@ class GiveSpawnerCommandExecutorTest {
             assertTrue(executor.runCommand(sender, new String[]{"Alex", "ZOMBIE", "2"}));
 
             verify(inventory).addItem(itemStack);
-            verify(sender).sendMessage("command.givespawner.success");
+            verify(sender).sendMessage("command.givespawner.success:Alex:ZOMBIE:2");
         }
     }
 
@@ -138,6 +141,21 @@ class GiveSpawnerCommandExecutorTest {
         when(plugin.getLocalization()).thenReturn(localization);
         when(localization.getMessage(org.mockito.ArgumentMatchers.anyString()))
                 .thenAnswer(invocation -> invocation.getArgument(0));
+        when(localization.getMessage(eq("command.givespawner.usage.sps"), anyMap()))
+                .thenReturn("command.givespawner.usage.sps");
+        when(localization.getMessage(eq("command.givespawner.usage.direct"), anyMap()))
+                .thenReturn("command.givespawner.usage.direct");
+        when(localization.getMessage(eq("command.givespawner.invalid_player"), anyMap()))
+                .thenAnswer(invocation -> "command.givespawner.invalid_player:" + invocation.<java.util.Map<String, String>>getArgument(1).get("player"));
+        when(localization.getMessage(eq("command.givespawner.invalid_type"), anyMap()))
+                .thenAnswer(invocation -> "command.givespawner.invalid_type:" + invocation.<java.util.Map<String, String>>getArgument(1).get("type"));
+        when(localization.getMessage(eq("command.givespawner.success"), anyMap()))
+                .thenAnswer(invocation -> {
+                    java.util.Map<String, String> args = invocation.getArgument(1);
+                    return "command.givespawner.success:" + args.get("player") + ":" + args.get("type") + ":" + args.get("amount");
+                });
+        when(localization.getMessage(eq("command.givespawner.no_permission"), anyMap()))
+                .thenReturn("command.givespawner.no_permission");
         return plugin;
     }
 }

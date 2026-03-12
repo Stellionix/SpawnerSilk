@@ -9,6 +9,8 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+import java.util.Collections;
+
 public class EditSpawnerCommandExecutor implements CommandExecutor {
 
 	private final SpawnerSilk plugin;
@@ -34,7 +36,10 @@ public class EditSpawnerCommandExecutor implements CommandExecutor {
 
 	public boolean runCommand(Player player, String[] args) {
 		Block block = player.getTargetBlockExact(10);
-		if (!player.hasPermission("spawnersilk.editspawner")) return false;
+		if (!player.hasPermission("spawnersilk.editspawner")) {
+			player.sendMessage(plugin.getLocalization().getMessage("command.editspawner.no_permission", Collections.emptyMap()));
+			return false;
+		}
 		if (args == null) return false;
 
 		if (block != null && block.getType() == Material.SPAWNER) {
@@ -130,7 +135,7 @@ public class EditSpawnerCommandExecutor implements CommandExecutor {
 	}
 
 	private void sendValueMessage(Player player, String key, int value) {
-		player.sendMessage(plugin.getLocalization().getMessage(key, java.util.Collections.singletonMap("value", String.valueOf(value))));
+		player.sendMessage(plugin.getLocalization().getMessage(key, Collections.singletonMap("value", String.valueOf(value))));
 	}
 
 }

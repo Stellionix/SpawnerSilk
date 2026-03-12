@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.argThat;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
 class SpawnerSilkCommandExecutorTest {
@@ -24,7 +25,7 @@ class SpawnerSilkCommandExecutorTest {
         Command command = mock(Command.class);
 
         when(plugin.getLocalization()).thenReturn(localization);
-        when(localization.getMessage("command.sps.reload.success")).thenReturn("[SpawnerSilk] Plugin reloaded successfully!");
+        when(localization.getMessage(eq("command.sps.reload.success"), anyMap())).thenReturn("[SpawnerSilk] Plugin reloaded successfully!");
         when(command.getName()).thenReturn("sps");
         when(player.hasPermission("spawnerSilk.reload")).thenReturn(true);
 
@@ -69,7 +70,7 @@ class SpawnerSilkCommandExecutorTest {
         Command command = mock(Command.class);
 
         when(plugin.getLocalization()).thenReturn(localization);
-        when(localization.getMessage("command.sps.unknown")).thenReturn("[SpawnerSilk] Unknown command");
+        when(localization.getMessage(eq("command.sps.unknown"), anyMap())).thenReturn("[SpawnerSilk] Unknown command");
         when(command.getName()).thenReturn("sps");
 
         boolean result = executor.onCommand(player, command, "sps", new String[]{"unknown"});

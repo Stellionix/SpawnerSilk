@@ -24,12 +24,16 @@ class EditSpawnerCommandExecutorTest {
     @Test
     void runCommandReturnsFalseWithoutPermission() {
         SpawnerSilk plugin = mock(SpawnerSilk.class);
+        LocalizationManager localization = mock(LocalizationManager.class);
         EditSpawnerCommandExecutor executor = new EditSpawnerCommandExecutor(plugin);
         Player player = mock(Player.class);
 
+        when(plugin.getLocalization()).thenReturn(localization);
+        when(localization.getMessage(eq("command.editspawner.no_permission"), anyMap())).thenReturn("no_permission");
         when(player.hasPermission("spawnersilk.editspawner")).thenReturn(false);
 
         assertFalse(executor.runCommand(player, new String[]{"delay", "10"}));
+        verify(player).sendMessage("no_permission");
     }
 
     @Test

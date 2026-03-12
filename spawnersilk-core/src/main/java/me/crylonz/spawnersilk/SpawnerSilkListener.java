@@ -29,6 +29,9 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Random;
 
 import static me.crylonz.spawnersilk.SpawnerSilk.getSpawnerMaterial;
@@ -227,13 +230,13 @@ public class SpawnerSilkListener implements Listener {
 
                     cs.getChunk().setForceLoaded(true);
 
-                    armorStands.add(SpawnerSilkHologram.generateHologram(cs.getLocation(), ChatColor.GOLD + "-- " + cs.getSpawnedType() + " Spawner --", 0.5f, 0.40f, 0.5f, this.plugin, e.getPlayer().getUniqueId()));
-                    armorStands.add(SpawnerSilkHologram.generateHologram(cs.getLocation(), ChatColor.GREEN + "Spawn Count " + ChatColor.WHITE + cs.getSpawnCount(), 0.5f, 0.05f, 0.5f, this.plugin, e.getPlayer().getUniqueId()));
-                    armorStands.add(SpawnerSilkHologram.generateHologram(cs.getLocation(), ChatColor.GREEN + "Spawn Range " + ChatColor.WHITE + cs.getSpawnRange(), 0.5f, -0.20f, 0.5f, this.plugin, e.getPlayer().getUniqueId()));
-                    armorStands.add(SpawnerSilkHologram.generateHologram(cs.getLocation(), ChatColor.GREEN + "Max Entities " + ChatColor.WHITE + cs.getMaxNearbyEntities(), 0.5f, -0.45f, 0.5f, this.plugin, e.getPlayer().getUniqueId()));
-                    armorStands.add(SpawnerSilkHologram.generateHologram(cs.getLocation(), ChatColor.GREEN + "Player Range " + ChatColor.WHITE + cs.getRequiredPlayerRange(), 0.5f, -0.70f, 0.5f, this.plugin, e.getPlayer().getUniqueId()));
-                    armorStands.add(SpawnerSilkHologram.generateHologram(cs.getLocation(), ChatColor.GREEN + "Max Spawn Delay " + ChatColor.WHITE + cs.getMaxSpawnDelay(), 0.5f, -0.95f, 0.5f, this.plugin, e.getPlayer().getUniqueId()));
-                    armorStands.add(SpawnerSilkHologram.generateHologram(cs.getLocation(), ChatColor.GREEN + "Min Spawn Delay " + ChatColor.WHITE + cs.getMinSpawnDelay(), 0.5f, -1.2f, 0.5f, this.plugin, e.getPlayer().getUniqueId()));
+                    armorStands.add(SpawnerSilkHologram.generateHologram(cs.getLocation(), plugin.getLocalization().getMessage("overlay.title", entityArgs(cs.getSpawnedType())), 0.5f, 0.40f, 0.5f, this.plugin, e.getPlayer().getUniqueId()));
+                    armorStands.add(SpawnerSilkHologram.generateHologram(cs.getLocation(), plugin.getLocalization().getMessage("overlay.spawn_count", valueArgs(cs.getSpawnCount())), 0.5f, 0.05f, 0.5f, this.plugin, e.getPlayer().getUniqueId()));
+                    armorStands.add(SpawnerSilkHologram.generateHologram(cs.getLocation(), plugin.getLocalization().getMessage("overlay.spawn_range", valueArgs(cs.getSpawnRange())), 0.5f, -0.20f, 0.5f, this.plugin, e.getPlayer().getUniqueId()));
+                    armorStands.add(SpawnerSilkHologram.generateHologram(cs.getLocation(), plugin.getLocalization().getMessage("overlay.max_entities", valueArgs(cs.getMaxNearbyEntities())), 0.5f, -0.45f, 0.5f, this.plugin, e.getPlayer().getUniqueId()));
+                    armorStands.add(SpawnerSilkHologram.generateHologram(cs.getLocation(), plugin.getLocalization().getMessage("overlay.player_range", valueArgs(cs.getRequiredPlayerRange())), 0.5f, -0.70f, 0.5f, this.plugin, e.getPlayer().getUniqueId()));
+                    armorStands.add(SpawnerSilkHologram.generateHologram(cs.getLocation(), plugin.getLocalization().getMessage("overlay.max_spawn_delay", valueArgs(cs.getMaxSpawnDelay())), 0.5f, -0.95f, 0.5f, this.plugin, e.getPlayer().getUniqueId()));
+                    armorStands.add(SpawnerSilkHologram.generateHologram(cs.getLocation(), plugin.getLocalization().getMessage("overlay.min_spawn_delay", valueArgs(cs.getMinSpawnDelay())), 0.5f, -1.2f, 0.5f, this.plugin, e.getPlayer().getUniqueId()));
 
                     getServer().getScheduler().scheduleSyncDelayedTask(this.plugin, new ArmorStandCleaner(armorStands), 20L * plugin.getDataConfig().getInt(SpawnerSilkConfig.SPAWNER_OVERLAY_DELAY));
 
@@ -255,5 +258,15 @@ public class SpawnerSilkListener implements Listener {
                 }
             }
         }
+    }
+
+    private Map<String, String> valueArgs(int value) {
+        return Collections.singletonMap("value", String.valueOf(value));
+    }
+
+    private Map<String, String> entityArgs(EntityType entityType) {
+        Map<String, String> replacements = new HashMap<>();
+        replacements.put("entity", entityType.name());
+        return replacements;
     }
 }

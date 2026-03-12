@@ -7,6 +7,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import java.util.Arrays;
+import java.util.Collections;
 
 public class SpawnerSilkCommandExecutor implements CommandExecutor {
 
@@ -35,6 +36,8 @@ public class SpawnerSilkCommandExecutor implements CommandExecutor {
 						if (player == null || player.hasPermission("spawnerSilk.reload")) {
 							reloadPlugin();
 							displayMessage(player, "command.sps.reload.success");
+						} else {
+							displayMessage(player, "command.sps.reload.no_permission");
 						}
 						break;
 					case "editspawner":
@@ -62,7 +65,7 @@ public class SpawnerSilkCommandExecutor implements CommandExecutor {
 	}
 
 	private void displayMessage(Player player, String messageKey) {
-		String message = plugin.getLocalization().getMessage(messageKey);
+		String message = plugin.getLocalization().getMessage(messageKey, Collections.emptyMap());
 		if (player == null) {
 			SpawnerSilk.log.info(org.bukkit.ChatColor.stripColor(message));
 		} else {

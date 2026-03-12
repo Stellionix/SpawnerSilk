@@ -11,6 +11,9 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class GiveSpawnerCommandExecutor implements CommandExecutor {
 
 	private final SpawnerSilk plugin;
@@ -77,16 +80,16 @@ public class GiveSpawnerCommandExecutor implements CommandExecutor {
 					// if the item is valid
 					if (is.getItemMeta() != null && SpawnerAPI.getEntityType(is) != EntityType.UNKNOWN) {
 						destinator.getInventory().addItem(is);
-						sendMessage(player, "command.givespawner.success");
+						sendMessage(player, "command.givespawner.success", messageArgs(destinator.getName(), args[1], amount));
 					}
 					// item not valid
 					else {
-						sendMessage(player, "command.givespawner.invalid_type");
+						sendMessage(player, "command.givespawner.invalid_type", messageArgs(null, args[1], null));
 					}
 
 					// destinator not valid
 				} else {
-					sendMessage(player, "command.givespawner.invalid_player");
+					sendMessage(player, "command.givespawner.invalid_player", messageArgs(args[0], null, null));
 				}
 
 				// not good argument structure
@@ -94,17 +97,37 @@ public class GiveSpawnerCommandExecutor implements CommandExecutor {
 				sendMessage(player, invalidFormatKey);
 			else
 				sendMessage(null, invalidFormatKey);
+		} else {
+			sendMessage(player, "command.givespawner.no_permission");
 		}
 		return true;
 	}
 
 	private void sendMessage(Player player, String key) {
-		String message = plugin.getLocalization().getMessage(key);
+		sendMessage(player, key, java.util.Collections.emptyMap());
+	}
+
+	private void sendMessage(Player player, String key, Map<String, String> replacements) {
+		String message = plugin.getLocalization().getMessage(key, replacements);
 		if (player != null) {
 			player.sendMessage(message);
 		} else {
 			SpawnerSilk.log.info(ChatColor.stripColor(message));
 		}
+	}
+
+	private Map<String, String> messageArgs(String playerName, String type, Integer amount) {
+		Map<String, String> replacements = new HashMap<>();
+		if (playerName != null) {
+			replacements.put("player", playerName);
+		}
+		if (type != null) {
+			replacements.put("type", type.toUpperCase());
+		}
+		if (amount != null) {
+			replacements.put("amount", String.valueOf(amount));
+		}
+		return replacements;
 	}
 
 
