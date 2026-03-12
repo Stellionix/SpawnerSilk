@@ -4,9 +4,10 @@
 
 <h2  align="center">
     <img src="http://cf.way2muchnoise.eu/full_322295_downloads.svg" alt="download"/> 
-    <img src="https://img.shields.io/github/license/apavarino/spawnersilk" alt="licence"/>
+    <img src="https://img.shields.io/github/last-commit/Stellionix/SpawnerSilk" alt="commit"/> 
     <a href="https://github.com/Stellionix/SpawnerSilk/actions/workflows/ci.yml"><img src="https://github.com/Stellionix/SpawnerSilk/actions/workflows/ci.yml/badge.svg" alt="ci"/></a>
-    <img src="https://img.shields.io/github/last-commit/apavarino/spawnersilk" alt="commit"/> 
+    <a href="https://stellionix.github.io/SpawnerSilk/"><img src="https://img.shields.io/badge/docs-online-blue" alt="docs"/></a>
+    <img src="https://img.shields.io/github/license/Stellionix/SpawnerSilk" alt="license"/>
 </h2>
 
 
