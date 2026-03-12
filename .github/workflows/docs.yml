@@ -61,5 +61,5 @@ jobs:
 
       - name: Deploy Versioned Documentation
         run: |
-          mike deploy --push --update-aliases 5.8.0 latest
+          mike deploy --push --update-aliases "${{ steps.version.outputs.value }}" latest
           mike set-default --push latest

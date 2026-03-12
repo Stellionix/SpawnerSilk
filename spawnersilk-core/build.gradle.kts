@@ -61,7 +61,7 @@ publishing {
         create<MavenPublication>("maven") {
             groupId = "me.crylonz.spawnersilk"
             artifactId = "spawner-silk"
-            version = "5.6.0-SNAPSHOT"
+            version = "5.9.0"
             from(components["java"])
         }
     }
