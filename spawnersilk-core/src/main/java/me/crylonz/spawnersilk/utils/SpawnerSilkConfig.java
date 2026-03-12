@@ -13,30 +13,63 @@ import java.io.Reader;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.logging.Logger;
 
 public class SpawnerSilkConfig {
 
-    public static final String AUTO_UPDATE = "auto-update";
-    public static final String NEED_SILK_TOUCH_TO_DESTROY = "need-silk-touch-to-destroy";
-    public static final String NEED_SILK_TOUCH = "need-silk-touch";
-    public static final String LANGUAGE = "language";
-    public static final String PICKAXE_MODE = "pickaxe-mode";
-    public static final String DROP_MODE = "drop-mode";
-    public static final String DROP_CHANCE = "drop-chance";
-    public static final String DROP_EGG_CHANCE = "drop-egg-chance";
-    public static final String EXPLOSION_DROP_CHANCE = "explosion-drop-chance";
-    public static final String SPAWNERS_CAN_BE_MODIFIED_BY_EGG = "spawners-can-be-modified-by-egg";
-    public static final String DROP_TO_INVENTORY = "drop-to-inventory";
-    public static final String USE_EGG = "use-egg";
-    public static final String DROP_IN_CREATIVE = "drop-in-creative";
-    public static final String SPAWNERS_GENERATE_XP = "spawners-generate-xp";
-    public static final String SPAWNER_OVERLAY = "spawner-overlay";
-    public static final String SPAWNER_OVERLAY_DELAY = "spawner-overlay-delay";
-    public static final String BLACKLIST = "blacklist";
+    public static final String AUTO_UPDATE = "updates.auto-download";
+    public static final String NEED_SILK_TOUCH_TO_DESTROY = "mining.require-silk-touch-to-break";
+    public static final String NEED_SILK_TOUCH = "mining.require-silk-touch-to-drop";
+    public static final String LANGUAGE = "localization.language";
+    public static final String PICKAXE_MODE = "mining.required-pickaxe-tier";
+    public static final String DROP_MODE = "drops.mode";
+    public static final String DROP_CHANCE = "drops.spawner-chance";
+    public static final String DROP_EGG_CHANCE = "drops.egg-chance";
+    public static final String EXPLOSION_DROP_CHANCE = "drops.explosion-chance";
+    public static final String SPAWNERS_CAN_BE_MODIFIED_BY_EGG = "interaction.allow-egg-modification";
+    public static final String DROP_TO_INVENTORY = "drops.to-inventory";
+    public static final String USE_EGG = "interaction.consume-egg";
+    public static final String DROP_IN_CREATIVE = "drops.allow-in-creative";
+    public static final String SPAWNERS_GENERATE_XP = "experience.drop-from-spawners";
+    public static final String SPAWNER_OVERLAY = "overlay.enabled";
+    public static final String SPAWNER_OVERLAY_DELAY = "overlay.duration-seconds";
+    public static final String FEEDBACK_BREAK_ERRORS = "feedback.break-errors";
+    public static final String FEEDBACK_PLACE_SUCCESS = "feedback.place-success";
+    public static final String FEEDBACK_INTERACT_ERRORS = "feedback.interact-errors";
+    public static final String FEEDBACK_INTERACT_SUCCESS = "feedback.interact-success";
+    public static final String BLACKLIST = "restrictions.blacklist";
     private static final String LEGACY_BLACKLIST = "black-list";
+
+    private static final Map<String, String> LEGACY_KEY_MAPPINGS = new LinkedHashMap<>();
+
+    static {
+        LEGACY_KEY_MAPPINGS.put("auto-update", AUTO_UPDATE);
+        LEGACY_KEY_MAPPINGS.put("need-silk-touch-to-destroy", NEED_SILK_TOUCH_TO_DESTROY);
+        LEGACY_KEY_MAPPINGS.put("need-silk-touch", NEED_SILK_TOUCH);
+        LEGACY_KEY_MAPPINGS.put("language", LANGUAGE);
+        LEGACY_KEY_MAPPINGS.put("pickaxe-mode", PICKAXE_MODE);
+        LEGACY_KEY_MAPPINGS.put("drop-mode", DROP_MODE);
+        LEGACY_KEY_MAPPINGS.put("drop-chance", DROP_CHANCE);
+        LEGACY_KEY_MAPPINGS.put("drop-egg-chance", DROP_EGG_CHANCE);
+        LEGACY_KEY_MAPPINGS.put("explosion-drop-chance", EXPLOSION_DROP_CHANCE);
+        LEGACY_KEY_MAPPINGS.put("spawners-can-be-modified-by-egg", SPAWNERS_CAN_BE_MODIFIED_BY_EGG);
+        LEGACY_KEY_MAPPINGS.put("drop-to-inventory", DROP_TO_INVENTORY);
+        LEGACY_KEY_MAPPINGS.put("use-egg", USE_EGG);
+        LEGACY_KEY_MAPPINGS.put("drop-in-creative", DROP_IN_CREATIVE);
+        LEGACY_KEY_MAPPINGS.put("spawners-generate-xp", SPAWNERS_GENERATE_XP);
+        LEGACY_KEY_MAPPINGS.put("spawner-overlay", SPAWNER_OVERLAY);
+        LEGACY_KEY_MAPPINGS.put("spawner-overlay-delay", SPAWNER_OVERLAY_DELAY);
+        LEGACY_KEY_MAPPINGS.put("feedback-break-errors", FEEDBACK_BREAK_ERRORS);
+        LEGACY_KEY_MAPPINGS.put("feedback-place-success", FEEDBACK_PLACE_SUCCESS);
+        LEGACY_KEY_MAPPINGS.put("feedback-interact-errors", FEEDBACK_INTERACT_ERRORS);
+        LEGACY_KEY_MAPPINGS.put("feedback-interact-success", FEEDBACK_INTERACT_SUCCESS);
+        LEGACY_KEY_MAPPINGS.put("blacklist", BLACKLIST);
+        LEGACY_KEY_MAPPINGS.put(LEGACY_BLACKLIST, BLACKLIST);
+    }
 
     private final JavaPlugin plugin;
 
@@ -107,13 +140,21 @@ public class SpawnerSilkConfig {
     private void migrateLegacyKeys(FileConfiguration config) {
         Logger logger = plugin.getLogger();
 
-        if (config.contains(LEGACY_BLACKLIST) && !config.isSet(BLACKLIST)) {
-            config.set(BLACKLIST, config.getStringList(LEGACY_BLACKLIST));
-            logger.info("Migrated legacy config key '" + LEGACY_BLACKLIST + "' to '" + BLACKLIST + "'");
+        for (Map.Entry<String, String> entry : LEGACY_KEY_MAPPINGS.entrySet()) {
+            String legacyKey = entry.getKey();
+            String newKey = entry.getValue();
+
+            if (!legacyKey.equals(newKey) && config.contains(legacyKey) && !config.isSet(newKey)) {
+                config.set(newKey, config.get(legacyKey));
+                logger.info("Migrated legacy config key '" + legacyKey + "' to '" + newKey + "'");
+            }
         }
 
-        if (config.contains(LEGACY_BLACKLIST)) {
-            config.set(LEGACY_BLACKLIST, null);
+        for (String legacyKey : LEGACY_KEY_MAPPINGS.keySet()) {
+            String mappedKey = LEGACY_KEY_MAPPINGS.get(legacyKey);
+            if (!legacyKey.equals(mappedKey) && config.contains(legacyKey)) {
+                config.set(legacyKey, null);
+            }
         }
     }
 
@@ -123,7 +164,7 @@ public class SpawnerSilkConfig {
                 continue;
             }
 
-            String sourceKey = resolveLegacySourceKey(existingConfig, key);
+            String sourceKey = resolveSourceKey(existingConfig, key);
             if (sourceKey != null && existingConfig.isSet(sourceKey)) {
                 targetConfig.set(key, existingConfig.get(sourceKey));
             }
@@ -139,6 +180,10 @@ public class SpawnerSilkConfig {
         normalizeInt(config, EXPLOSION_DROP_CHANCE, 10, 0, 100);
         normalizeInt(config, SPAWNER_OVERLAY_DELAY, 10, 3, Integer.MAX_VALUE);
         normalizeUppercaseList(config, BLACKLIST, Arrays.asList("BOAT_SPAWNER"));
+        normalizeBoolean(config, FEEDBACK_BREAK_ERRORS, true);
+        normalizeBoolean(config, FEEDBACK_PLACE_SUCCESS, false);
+        normalizeBoolean(config, FEEDBACK_INTERACT_ERRORS, true);
+        normalizeBoolean(config, FEEDBACK_INTERACT_SUCCESS, false);
     }
 
     private void normalizeLocale(FileConfiguration config, String key, String defaultValue) {
@@ -164,6 +209,13 @@ public class SpawnerSilkConfig {
         if (value != normalized) {
             config.set(key, normalized);
             plugin.getLogger().warning("Config key '" + key + "' out of range. Clamped to " + normalized);
+        }
+    }
+
+    private void normalizeBoolean(FileConfiguration config, String key, boolean defaultValue) {
+        if (!config.isBoolean(key)) {
+            config.set(key, defaultValue);
+            plugin.getLogger().warning("Config key '" + key + "' is invalid. Reset to " + defaultValue);
         }
     }
 
@@ -196,15 +248,18 @@ public class SpawnerSilkConfig {
     }
 
     private String resolveKey(String key) {
-        if (LEGACY_BLACKLIST.equals(key)) {
-            return BLACKLIST;
-        }
-        return key;
+        return LEGACY_KEY_MAPPINGS.getOrDefault(key, key);
     }
 
-    private String resolveLegacySourceKey(FileConfiguration config, String key) {
-        if (BLACKLIST.equals(key) && config.contains(LEGACY_BLACKLIST)) {
-            return LEGACY_BLACKLIST;
+    private String resolveSourceKey(FileConfiguration config, String key) {
+        if (config.isSet(key)) {
+            return key;
+        }
+
+        for (Map.Entry<String, String> entry : LEGACY_KEY_MAPPINGS.entrySet()) {
+            if (entry.getValue().equals(key) && config.isSet(entry.getKey())) {
+                return entry.getKey();
+            }
         }
         return key;
     }

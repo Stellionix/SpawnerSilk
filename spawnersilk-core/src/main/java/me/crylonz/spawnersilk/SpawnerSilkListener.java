@@ -67,10 +67,14 @@ public class SpawnerSilkListener implements Listener {
                 if (!p.getInventory().getItemInMainHand().getEnchantments().containsKey(Enchantment.SILK_TOUCH)
                         && plugin.getDataConfig().getBoolean(SpawnerSilkConfig.NEED_SILK_TOUCH_TO_DESTROY)) {
                     e.setCancelled(true);
+                    sendFeedback(p, SpawnerSilkConfig.FEEDBACK_BREAK_ERRORS, "event.break.need_silk_touch");
                 }
 
-                if ((p.getInventory().getItemInMainHand().getEnchantments().containsKey(Enchantment.SILK_TOUCH)
-                        || !plugin.getDataConfig().getBoolean(SpawnerSilkConfig.NEED_SILK_TOUCH)) && canGetSpawner(p)) {
+                boolean canDropWithSilkRule = p.getInventory().getItemInMainHand().getEnchantments().containsKey(Enchantment.SILK_TOUCH)
+                        || !plugin.getDataConfig().getBoolean(SpawnerSilkConfig.NEED_SILK_TOUCH);
+                boolean canUsePickaxe = canGetSpawner(p);
+
+                if (canDropWithSilkRule && canUsePickaxe) {
 
                     int randomSpawnerDrop = new Random().nextInt(100);
                     int randomEggDrop = new Random().nextInt(100);
@@ -78,6 +82,8 @@ public class SpawnerSilkListener implements Listener {
                     dropToPlayer(e,
                             plugin.getDataConfig().getInt(SpawnerSilkConfig.DROP_CHANCE) >= randomSpawnerDrop,
                             plugin.getDataConfig().getInt(SpawnerSilkConfig.DROP_EGG_CHANCE) >= randomEggDrop);
+                } else if (canDropWithSilkRule && !canUsePickaxe) {
+                    sendFeedback(p, SpawnerSilkConfig.FEEDBACK_BREAK_ERRORS, "event.break.pickaxe_too_weak", pickaxeArgs());
                 }
             }
         }
@@ -92,6 +98,7 @@ public class SpawnerSilkListener implements Listener {
                 .getList(SpawnerSilkConfig.BLACKLIST)
                 .stream()
                 .anyMatch(bannedEntity -> bannedEntity.toUpperCase().contains(entity.name().toUpperCase()))) {
+            sendFeedback(e.getPlayer(), SpawnerSilkConfig.FEEDBACK_BREAK_ERRORS, "event.break.blacklisted", typeArgs(entity));
             return;
         }
 
@@ -175,8 +182,10 @@ public class SpawnerSilkListener implements Listener {
 
             if (entityType != EntityType.UNKNOWN) {
                 cs.setSpawnedType(SpawnerAPI.getEntityType(e.getItemInHand()));
+                sendFeedback(e.getPlayer(), SpawnerSilkConfig.FEEDBACK_PLACE_SUCCESS, "event.place.success", typeArgs(entityType));
             } else {
                 cs.setSpawnedType(EntityType.PIG);
+                sendFeedback(e.getPlayer(), SpawnerSilkConfig.FEEDBACK_PLACE_SUCCESS, "event.place.unknown_type_fallback", typeArgs(EntityType.PIG));
             }
             cs.update();
         }
@@ -198,6 +207,7 @@ public class SpawnerSilkListener implements Listener {
             if (e.getAction() == Action.RIGHT_CLICK_BLOCK) {
                 if (e.getClickedBlock() != null && e.getClickedBlock().getType() == getSpawnerMaterial()) {
                     e.setCancelled(true);
+                    sendFeedback(e.getPlayer(), SpawnerSilkConfig.FEEDBACK_INTERACT_ERRORS, "event.interact.modification_disabled");
                 }
             }
         } else {
@@ -206,8 +216,10 @@ public class SpawnerSilkListener implements Listener {
                     e.getItem().getType().name().toUpperCase().contains("EGG")) {
                 e.setCancelled(true);
                 CreatureSpawner cs = (CreatureSpawner) e.getPlayer().getTargetBlock(null, 5).getState();
-                cs.setSpawnedType(EntityType.valueOf(e.getItem().getType().name().replace("_SPAWN_EGG", "")));
+                EntityType newType = EntityType.valueOf(e.getItem().getType().name().replace("_SPAWN_EGG", ""));
+                cs.setSpawnedType(newType);
                 cs.update();
+                sendFeedback(e.getPlayer(), SpawnerSilkConfig.FEEDBACK_INTERACT_SUCCESS, "event.interact.changed", typeArgs(newType));
             }
         }
     }
@@ -268,5 +280,46 @@ public class SpawnerSilkListener implements Listener {
         Map<String, String> replacements = new HashMap<>();
         replacements.put("entity", entityType.name());
         return replacements;
+    }
+
+    private Map<String, String> typeArgs(EntityType entityType) {
+        Map<String, String> replacements = new HashMap<>();
+        replacements.put("type", entityType.name());
+        return replacements;
+    }
+
+    private Map<String, String> pickaxeArgs() {
+        Map<String, String> replacements = new HashMap<>();
+        replacements.put("required_pickaxe", requiredPickaxeName(plugin.getDataConfig().getInt(SpawnerSilkConfig.PICKAXE_MODE)));
+        return replacements;
+    }
+
+    private String requiredPickaxeName(int mode) {
+        switch (mode) {
+            case 1:
+                return "WOODEN_PICKAXE";
+            case 2:
+                return "STONE_PICKAXE";
+            case 3:
+                return "IRON_PICKAXE";
+            case 4:
+                return "GOLDEN_PICKAXE";
+            case 5:
+                return "DIAMOND_PICKAXE";
+            case 6:
+                return "NETHERITE_PICKAXE";
+            default:
+                return "PICKAXE";
+        }
+    }
+
+    private void sendFeedback(Player player, String configKey, String messageKey) {
+        sendFeedback(player, configKey, messageKey, Collections.emptyMap());
+    }
+
+    private void sendFeedback(Player player, String configKey, String messageKey, Map<String, String> replacements) {
+        if (player != null && plugin.getDataConfig().getBoolean(configKey)) {
+            player.sendMessage(plugin.getLocalization().getMessage(messageKey, replacements));
+        }
     }
 }

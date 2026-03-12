@@ -1,99 +1,100 @@
-################################################################################################################################
-# Welcome to the SpawnerSilk configuration file!                                                                               #
-#                                                                                                                              #
-# You can find more information about the plugin and this file on the plugin page:                                             #
-#   > https://dev.bukkit.org/projects/spawnersilk                                                                              #
-# If you need any support, feel free to ask for it on our Discord server:                                                      #
-#   > https://discordapp.com/invite/jCsvJxS                                                                                    #
-#                                                                                                                              #
-# If you make any changes in this file, please run the command '/sps reload' to apply the changes!                             #
-################################################################################################################################
+####################################################################################################
+# SpawnerSilk configuration
+# Changes made in this file are applied with /sps reload.
+####################################################################################################
 
-# true  : New update will be downloaded and installed automatically
-# false : You need to download and install update by yourself
-auto-update: true
+####################################################################################################
+# SpawnerSilk Configuration
+#
+# Plugin page and documentation:
+#   https://dev.bukkit.org/projects/spawnersilk
+#
+# Support (Discord):
+#   https://discordapp.com/invite/jCsvJxS
+#
+# After editing this file, run '/sps reload' to apply the new settings.
+####################################################################################################
 
-# true  : Only player with silkTouch can destroy spawner (need spawnersilk.minespawner permission)
-# false : Everybody can destroy spawner
-need-silk-touch-to-destroy: false
+localization:
+  # Language file loaded from plugins/SpawnerSilk/localization/<language>.json
+  # The plugin currently ships with en_us only.
+  language: en_us
 
-# true  : Only player with silkTouch can drop spawner (need spawnersilk.minespawner permission)
-# false : Everybody can drop spawner
-need-silk-touch: true
+updates:
+  # Automatically download and install compatible updates when available.
+  auto-download: true
 
-# Language used to load plugins/SpawnerSilk/localization/<language>.json
-# Only en_us is bundled for now
-language: en_us
+mining:
+  # Require Silk Touch to break a spawner at all.
+  require-silk-touch-to-break: false
 
-# 0 : Player can get spawner by breaking it no matter how
-# 1 : Player need to break the spawner with wooden pickaxe or better
-# 2 : Player need to break the spawner with stone pickaxe or better
-# 3 : Player need to break the spawner with iron pickaxe or better
-# 4 : Player need to break the spawner with golden pickaxe or better
-# 5 : Player need to break the spawner with diamond pickaxe or better
-# 6 : Player need to break the spawner with netherite pickaxe
-pickaxe-mode: 5
+  # Require Silk Touch for the spawner to drop when broken.
+  require-silk-touch-to-drop: true
 
-# 0 : Spawner of the creature is dropped
-# 1 : Basic spawner is dropped with egg of the creature type (depends on drop-egg-chance)
-drop-mode: 0
+  # Minimum pickaxe tier required to obtain a spawner.
+  # 0 = any tool
+  # 1 = wooden pickaxe or better
+  # 2 = stone pickaxe or better
+  # 3 = iron pickaxe or better
+  # 4 = golden pickaxe or better
+  # 5 = diamond pickaxe or better
+  # 6 = netherite pickaxe only
+  required-pickaxe-tier: 5
 
+drops:
+  # Drop mode:
+  # 0 = drop a typed spawner item
+  # 1 = drop a basic spawner plus a spawn egg
+  mode: 0
 
-# Percentage of chance that player drop a spawner by mining it
-drop-chance: 100
+  # Chance in percent to drop a spawner when broken.
+  spawner-chance: 100
 
-# Percentage of chance that player drop an egg (only for drop-mode = 1)
-drop-egg-chance: 100
+  # Chance in percent to drop a spawn egg when mode = 1.
+  egg-chance: 100
 
-# Percentage of chance that player drop a spawner by an explosion
-explosion-drop-chance: 10
+  # Chance in percent to drop a spawner after an explosion.
+  explosion-chance: 10
 
-# true  : player can change the spawner type with eggs
-# false : Spawner type is locked
-spawners-can-be-modified-by-egg: true
+  # Send the drop directly to the player's inventory when possible.
+  to-inventory: false
 
-# true  : Spawner go directly to inventory
-# false : Naturally drop the spawner
-drop-to-inventory: false
+  # Allow spawners to drop while the player is in creative mode.
+  allow-in-creative: false
 
-# true : egg is consume on the spawner
-# false : egg is not consume on the spawner
-use-egg: true
+interaction:
+  # Allow players to change a spawner type with spawn eggs.
+  allow-egg-modification: true
 
-# true : spawner drops on creative mode
-# false : spawner don't drop on creative mode
-drop-in-creative: false
+  # Consume the spawn egg when modifying a spawner.
+  consume-egg: true
 
-# true : xp drops when mining spawner (warning : risk of xp farming !)
-# false :xp don't drop when mining spawner
-spawners-generate-xp: false
+experience:
+  # Drop experience when a spawner is mined.
+  drop-from-spawners: false
 
-# true : enable spawner overlay to see spawner detail when looking at it (need also spawnersilk.overlay perms)
-# false : disable spawner overlay
-spawner-overlay: true
+overlay:
+  # Show hologram details while looking at a spawner.
+  enabled: true
 
-# Time in seconds before the overlay disappears
-# A time less than 3s is not recommended
-spawner-overlay-delay: 10
+  # Time in seconds before the overlay disappears.
+  duration-seconds: 10
 
-# You can put spawners that you don't want droppable in this list. The name is the entity name in uppercase (ex BEE).
-# In case of space in the name just put an _ (ex : ZOMBIE_HORSE)
-blacklist:
-  - 'BOAT_SPAWNER'
+feedback:
+  # Show player-facing error messages during spawner breaking.
+  break-errors: true
 
+  # Show a success message after placing a spawner.
+  place-success: false
 
+  # Show player-facing error messages during spawner interaction.
+  interact-errors: true
 
+  # Show a success message after changing a spawner with an egg.
+  interact-success: false
 
-
-
-
-
-
-
-
-
-
-
-
-
-
+restrictions:
+  # Spawner types that must never be collected.
+  # Values are entity names in uppercase, using underscores for spaces.
+  blacklist:
+    - BOAT_SPAWNER

@@ -1,5 +1,6 @@
 package me.crylonz.spawnersilk;
 
+import me.crylonz.spawnersilk.utils.LocalizationManager;
 import me.crylonz.spawnersilk.utils.SpawnerSilkConfig;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
@@ -10,6 +11,9 @@ import org.bukkit.block.CreatureSpawner;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.event.block.Action;
+import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.junit.jupiter.api.Test;
@@ -65,6 +69,7 @@ class SpawnerSilkListenerTest {
     void dropToPlayerStopsWhenEntityIsBlacklisted() {
         SpawnerSilk plugin = mock(SpawnerSilk.class);
         SpawnerSilkConfig config = mock(SpawnerSilkConfig.class);
+        LocalizationManager localization = mock(LocalizationManager.class);
         BlockBreakEvent event = mock(BlockBreakEvent.class);
         Block block = mock(Block.class);
         CreatureSpawner spawner = mock(CreatureSpawner.class);
@@ -72,7 +77,10 @@ class SpawnerSilkListenerTest {
         SpawnerSilkListener listener = new SpawnerSilkListener(plugin);
 
         when(plugin.getDataConfig()).thenReturn(config);
+        when(plugin.getLocalization()).thenReturn(localization);
+        when(localization.getMessage(eq("event.break.blacklisted"), any())).thenReturn("blacklisted");
         when(config.getList(SpawnerSilkConfig.BLACKLIST)).thenReturn(new java.util.ArrayList<>(Arrays.asList("ZOMBIE")));
+        when(config.getBoolean(SpawnerSilkConfig.FEEDBACK_BREAK_ERRORS)).thenReturn(true);
         when(event.getBlock()).thenReturn(block);
         when(block.getState()).thenReturn(spawner);
         when(spawner.getSpawnedType()).thenReturn(EntityType.ZOMBIE);
@@ -84,6 +92,7 @@ class SpawnerSilkListenerTest {
 
             verify(event, never()).setExpToDrop(any(Integer.class));
             verify(player, never()).getInventory();
+            verify(player).sendMessage("blacklisted");
         }
     }
 
@@ -159,6 +168,69 @@ class SpawnerSilkListenerTest {
             listener.dropToPlayer(event, true, false);
 
             verify(world).dropItemNaturally(location, spawnerItem);
+        }
+    }
+
+    @Test
+    void blockPlaceSendsSuccessFeedbackWhenConfigured() {
+        SpawnerSilk plugin = mock(SpawnerSilk.class);
+        SpawnerSilkConfig config = mock(SpawnerSilkConfig.class);
+        LocalizationManager localization = mock(LocalizationManager.class);
+        BlockPlaceEvent event = mock(BlockPlaceEvent.class);
+        Block block = mock(Block.class);
+        CreatureSpawner spawner = mock(CreatureSpawner.class);
+        Player player = mock(Player.class);
+        ItemStack item = mock(ItemStack.class);
+        SpawnerSilkListener listener = new SpawnerSilkListener(plugin);
+
+        when(plugin.getDataConfig()).thenReturn(config);
+        when(plugin.getLocalization()).thenReturn(localization);
+        when(localization.getMessage(eq("event.place.success"), any())).thenReturn("placed");
+        when(event.getBlockPlaced()).thenReturn(block);
+        when(block.getType()).thenReturn(Material.SPAWNER);
+        when(block.getState()).thenReturn(spawner);
+        when(event.getItemInHand()).thenReturn(item);
+        when(event.getPlayer()).thenReturn(player);
+        when(config.getBoolean(SpawnerSilkConfig.FEEDBACK_PLACE_SUCCESS)).thenReturn(true);
+
+        try (MockedStatic<SpawnerSilk> spawnerSilk = mockStatic(SpawnerSilk.class);
+             MockedStatic<SpawnerAPI> spawnerApi = mockStatic(SpawnerAPI.class)) {
+            spawnerSilk.when(SpawnerSilk::getSpawnerMaterial).thenReturn(Material.SPAWNER);
+            spawnerApi.when(() -> SpawnerAPI.getEntityType(item)).thenReturn(EntityType.ZOMBIE);
+
+            listener.onBlockPlaceEvent(event);
+
+            verify(player).sendMessage("placed");
+        }
+    }
+
+    @Test
+    void interactSendsDisabledFeedbackWhenConfigured() {
+        SpawnerSilk plugin = mock(SpawnerSilk.class);
+        SpawnerSilkConfig config = mock(SpawnerSilkConfig.class);
+        LocalizationManager localization = mock(LocalizationManager.class);
+        PlayerInteractEvent event = mock(PlayerInteractEvent.class);
+        Player player = mock(Player.class);
+        Block block = mock(Block.class);
+        SpawnerSilkListener listener = new SpawnerSilkListener(plugin);
+
+        when(plugin.getDataConfig()).thenReturn(config);
+        when(plugin.getLocalization()).thenReturn(localization);
+        when(localization.getMessage(eq("event.interact.modification_disabled"), any())).thenReturn("disabled");
+        when(config.getBoolean(SpawnerSilkConfig.SPAWNERS_CAN_BE_MODIFIED_BY_EGG)).thenReturn(false);
+        when(config.getBoolean(SpawnerSilkConfig.FEEDBACK_INTERACT_ERRORS)).thenReturn(true);
+        when(event.getAction()).thenReturn(Action.RIGHT_CLICK_BLOCK);
+        when(event.getClickedBlock()).thenReturn(block);
+        when(block.getType()).thenReturn(Material.SPAWNER);
+        when(event.getPlayer()).thenReturn(player);
+
+        try (MockedStatic<SpawnerSilk> spawnerSilk = mockStatic(SpawnerSilk.class)) {
+            spawnerSilk.when(SpawnerSilk::getSpawnerMaterial).thenReturn(Material.SPAWNER);
+
+            listener.onPlayerInteractEvent(event);
+
+            verify(event).setCancelled(true);
+            verify(player).sendMessage("disabled");
         }
     }
 }
