@@ -27,7 +27,7 @@ class SpawnerSilkCommandExecutorTest {
         when(plugin.getLocalization()).thenReturn(localization);
         when(localization.getMessage(eq("command.sps.reload.success"), anyMap())).thenReturn("[SpawnerSilk] Plugin reloaded successfully!");
         when(command.getName()).thenReturn("sps");
-        when(player.hasPermission("spawnerSilk.reload")).thenReturn(true);
+        when(player.hasPermission("spawnersilk.reload")).thenReturn(true);
 
         boolean result = executor.onCommand(player, command, "sps", new String[]{"reload"});
 

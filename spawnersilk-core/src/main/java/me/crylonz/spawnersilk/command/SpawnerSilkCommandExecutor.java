@@ -33,7 +33,7 @@ public class SpawnerSilkCommandExecutor implements CommandExecutor {
 			if (args.length >= 1) {
 				switch (args[0].toLowerCase()) {
 					case "reload":
-						if (player == null || player.hasPermission("spawnerSilk.reload")) {
+						if (player == null || player.hasPermission("spawnersilk.reload")) {
 							reloadPlugin();
 							displayMessage(player, "command.sps.reload.success");
 						} else {
