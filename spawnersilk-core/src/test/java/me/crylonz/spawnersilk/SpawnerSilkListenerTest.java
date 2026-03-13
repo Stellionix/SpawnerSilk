@@ -10,6 +10,7 @@ import org.bukkit.block.Block;
 import org.bukkit.block.CreatureSpawner;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.block.Action;
@@ -25,6 +26,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.intThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.never;
@@ -231,6 +233,85 @@ class SpawnerSilkListenerTest {
 
             verify(event).setCancelled(true);
             verify(player).sendMessage("disabled");
+        }
+    }
+
+    @Test
+    void interactDoesNotConsumeEggWhenDisabledInConfig() {
+        SpawnerSilk plugin = mock(SpawnerSilk.class);
+        SpawnerSilkConfig config = mock(SpawnerSilkConfig.class);
+        LocalizationManager localization = mock(LocalizationManager.class);
+        PlayerInteractEvent event = mock(PlayerInteractEvent.class);
+        Player player = mock(Player.class);
+        Block block = mock(Block.class);
+        CreatureSpawner spawner = mock(CreatureSpawner.class);
+        ItemStack egg = mock(ItemStack.class);
+        SpawnerSilkListener listener = new SpawnerSilkListener(plugin);
+
+        when(plugin.getDataConfig()).thenReturn(config);
+        when(plugin.getLocalization()).thenReturn(localization);
+        when(config.getBoolean(SpawnerSilkConfig.SPAWNERS_CAN_BE_MODIFIED_BY_EGG)).thenReturn(true);
+        when(config.getBoolean(SpawnerSilkConfig.USE_EGG)).thenReturn(false);
+        when(config.getBoolean(SpawnerSilkConfig.FEEDBACK_INTERACT_SUCCESS)).thenReturn(false);
+        when(event.getAction()).thenReturn(Action.RIGHT_CLICK_BLOCK);
+        when(event.getClickedBlock()).thenReturn(block);
+        when(event.getItem()).thenReturn(egg);
+        when(event.getPlayer()).thenReturn(player);
+        when(event.getHand()).thenReturn(EquipmentSlot.HAND);
+        when(block.getType()).thenReturn(Material.SPAWNER);
+        when(block.getState()).thenReturn(spawner);
+        when(egg.getType()).thenReturn(Material.ZOMBIE_SPAWN_EGG);
+        when(player.getGameMode()).thenReturn(GameMode.SURVIVAL);
+
+        try (MockedStatic<SpawnerSilk> spawnerSilk = mockStatic(SpawnerSilk.class)) {
+            spawnerSilk.when(SpawnerSilk::getSpawnerMaterial).thenReturn(Material.SPAWNER);
+
+            listener.onPlayerInteractEvent(event);
+
+            verify(event).setCancelled(true);
+            verify(spawner).setSpawnedType(EntityType.ZOMBIE);
+            verify(spawner).update();
+            verify(egg, never()).setAmount(any(Integer.class));
+        }
+    }
+
+    @Test
+    void interactConsumesEggWhenEnabledInConfig() {
+        SpawnerSilk plugin = mock(SpawnerSilk.class);
+        SpawnerSilkConfig config = mock(SpawnerSilkConfig.class);
+        LocalizationManager localization = mock(LocalizationManager.class);
+        PlayerInteractEvent event = mock(PlayerInteractEvent.class);
+        Player player = mock(Player.class);
+        Block block = mock(Block.class);
+        CreatureSpawner spawner = mock(CreatureSpawner.class);
+        ItemStack egg = mock(ItemStack.class);
+        SpawnerSilkListener listener = new SpawnerSilkListener(plugin);
+
+        when(plugin.getDataConfig()).thenReturn(config);
+        when(plugin.getLocalization()).thenReturn(localization);
+        when(config.getBoolean(SpawnerSilkConfig.SPAWNERS_CAN_BE_MODIFIED_BY_EGG)).thenReturn(true);
+        when(config.getBoolean(SpawnerSilkConfig.USE_EGG)).thenReturn(true);
+        when(config.getBoolean(SpawnerSilkConfig.FEEDBACK_INTERACT_SUCCESS)).thenReturn(false);
+        when(event.getAction()).thenReturn(Action.RIGHT_CLICK_BLOCK);
+        when(event.getClickedBlock()).thenReturn(block);
+        when(event.getItem()).thenReturn(egg);
+        when(event.getPlayer()).thenReturn(player);
+        when(event.getHand()).thenReturn(EquipmentSlot.HAND);
+        when(block.getType()).thenReturn(Material.SPAWNER);
+        when(block.getState()).thenReturn(spawner);
+        when(egg.getType()).thenReturn(Material.ZOMBIE_SPAWN_EGG);
+        when(egg.getAmount()).thenReturn(3);
+        when(player.getGameMode()).thenReturn(GameMode.SURVIVAL);
+
+        try (MockedStatic<SpawnerSilk> spawnerSilk = mockStatic(SpawnerSilk.class)) {
+            spawnerSilk.when(SpawnerSilk::getSpawnerMaterial).thenReturn(Material.SPAWNER);
+
+            listener.onPlayerInteractEvent(event);
+
+            verify(event).setCancelled(true);
+            verify(spawner).setSpawnedType(EntityType.ZOMBIE);
+            verify(spawner).update();
+            verify(egg).setAmount(intThat(amount -> amount == 2));
         }
     }
 }

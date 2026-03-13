@@ -11,6 +11,7 @@ import org.bukkit.block.CreatureSpawner;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.EntityType;
+import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
@@ -203,25 +204,35 @@ public class SpawnerSilkListener implements Listener {
 
     @EventHandler
     public void onPlayerInteractEvent(PlayerInteractEvent e) {
-        if (!plugin.getDataConfig().getBoolean(SpawnerSilkConfig.SPAWNERS_CAN_BE_MODIFIED_BY_EGG)) {
-            if (e.getAction() == Action.RIGHT_CLICK_BLOCK) {
-                if (e.getClickedBlock() != null && e.getClickedBlock().getType() == getSpawnerMaterial()) {
-                    e.setCancelled(true);
-                    sendFeedback(e.getPlayer(), SpawnerSilkConfig.FEEDBACK_INTERACT_ERRORS, "event.interact.modification_disabled");
-                }
-            }
-        } else {
-            if (!plugin.getDataConfig().getBoolean(SpawnerSilkConfig.USE_EGG) && e.getItem() != null &&
-                    e.getPlayer().getTargetBlock(null, 5).getType() == getSpawnerMaterial() &&
-                    e.getItem().getType().name().toUpperCase().contains("EGG")) {
-                e.setCancelled(true);
-                CreatureSpawner cs = (CreatureSpawner) e.getPlayer().getTargetBlock(null, 5).getState();
-                EntityType newType = EntityType.valueOf(e.getItem().getType().name().replace("_SPAWN_EGG", ""));
-                cs.setSpawnedType(newType);
-                cs.update();
-                sendFeedback(e.getPlayer(), SpawnerSilkConfig.FEEDBACK_INTERACT_SUCCESS, "event.interact.changed", typeArgs(newType));
-            }
+        if (e.getAction() != Action.RIGHT_CLICK_BLOCK || e.getClickedBlock() == null || e.getClickedBlock().getType() != getSpawnerMaterial()) {
+            return;
         }
+
+        if (!plugin.getDataConfig().getBoolean(SpawnerSilkConfig.SPAWNERS_CAN_BE_MODIFIED_BY_EGG)) {
+            e.setCancelled(true);
+            sendFeedback(e.getPlayer(), SpawnerSilkConfig.FEEDBACK_INTERACT_ERRORS, "event.interact.modification_disabled");
+            return;
+        }
+
+        if (e.getItem() == null || !e.getItem().getType().name().toUpperCase().contains("EGG")) {
+            return;
+        }
+
+        e.setCancelled(true);
+
+        CreatureSpawner cs = (CreatureSpawner) e.getClickedBlock().getState();
+        EntityType newType = EntityType.valueOf(e.getItem().getType().name().replace("_SPAWN_EGG", ""));
+        cs.setSpawnedType(newType);
+        cs.update();
+
+        if (plugin.getDataConfig().getBoolean(SpawnerSilkConfig.USE_EGG)
+                && e.getPlayer().getGameMode() != GameMode.CREATIVE
+                && e.getHand() == EquipmentSlot.HAND) {
+            ItemStack item = e.getItem();
+            item.setAmount(item.getAmount() - 1);
+        }
+
+        sendFeedback(e.getPlayer(), SpawnerSilkConfig.FEEDBACK_INTERACT_SUCCESS, "event.interact.changed", typeArgs(newType));
     }
 
     @EventHandler
