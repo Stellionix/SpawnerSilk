@@ -23,6 +23,13 @@ tasks.register("copyJar", Copy::class) {
     into(pluginDir)
 }
 
+tasks.processResources {
+    val pluginVersion = project.version.toString()
+    inputs.property("pluginVersion", pluginVersion)
+    filesMatching("plugin.yml") {
+        expand("pluginVersion" to pluginVersion)
+    }
+}
 
 repositories {
     mavenCentral()
@@ -53,15 +60,15 @@ tasks.test {
 
 tasks.withType<ShadowJar> {
     relocate("org.bstats", "me.crylonz.spawnersilk")
-    archiveFileName.set("spawner-silk-SNAPSHOT.jar")
+    archiveFileName.set("spawner-silk-${project.version}.jar")
 }
 
 publishing {
     publications {
         create<MavenPublication>("maven") {
-            groupId = "me.crylonz.spawnersilk"
+            groupId = project.group.toString()
             artifactId = "spawner-silk"
-            version = "5.9.2"
+            version = project.version.toString()
             from(components["java"])
         }
     }
