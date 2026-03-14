@@ -1,6 +1,6 @@
 name: SpawnerSilk
 main: me.crylonz.spawnersilk.SpawnerSilk
-version: "5.9.0"
+version: "5.9.2"
 author: Crylonz
 softdepend: [ShopGUIPlus]
 description: Mine and manage mob spawners with Silk Touch
