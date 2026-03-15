@@ -9,7 +9,8 @@ on:
       - "mkdocs.yml"
       - "requirements.txt"
       - ".github/workflows/docs.yml"
-      - "spawnersilk-core/src/main/resources/plugin.yml"
+      - "build.gradle.kts"
+      - "spawnersilk-core/build.gradle.kts"
   workflow_dispatch:
 
 permissions:
@@ -45,10 +46,10 @@ jobs:
           import re
           from pathlib import Path
 
-          content = Path("spawnersilk-core/src/main/resources/plugin.yml").read_text(encoding="utf-8")
-          match = re.search(r'^version:\s*"?(.*?)"?\s*$', content, re.MULTILINE)
+          content = Path("build.gradle.kts").read_text(encoding="utf-8")
+          match = re.search(r'version\s*=\s*"([^"]+)"', content)
           if not match:
-              raise SystemExit("Unable to resolve plugin version from plugin.yml")
+              raise SystemExit("Unable to resolve plugin version from build.gradle.kts")
           print(match.group(1))
           PY
           )
