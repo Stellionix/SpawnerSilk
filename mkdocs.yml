@@ -5,59 +5,13 @@ repo_name: Stellionix/SpawnerSilk
 
 plugins:
   - search
+  - stellionix-shared-docs
 
 theme:
   name: material
   language: en
   logo: assets/images/spawnersilk-logo-small.png
   favicon: assets/images/spawnersilk-logo-small.png
-  features:
-    - navigation.sections
-    - navigation.top
-    - navigation.instant
-    - navigation.tracking
-    - content.code.copy
-    - search.suggest
-    - search.highlight
-  palette:
-    - media: "(prefers-color-scheme: light)"
-      scheme: default
-      primary: teal
-      accent: amber
-      toggle:
-        icon: material/weather-night
-        name: Switch to dark mode
-    - media: "(prefers-color-scheme: dark)"
-      scheme: slate
-      primary: cyan
-      accent: amber
-      toggle:
-        icon: material/weather-sunny
-        name: Switch to light mode
-
-markdown_extensions:
-  - admonition
-  - attr_list
-  - md_in_html
-  - tables
-
-extra_css:
-  - stylesheets/extra.css
-
-extra:
-  version:
-    provider: mike
-  social:
-    - icon: fontawesome/brands/github
-      link: https://github.com/Stellionix/SpawnerSilk
-    - icon: fontawesome/brands/discord
-      link: https://discord.com/invite/jCsvJxS
-
-copyright: Copyright (c) SpawnerSilk
-
-docs_dir: docs
-site_dir: site
-use_directory_urls: true
 
 nav:
   - Getting Started:
