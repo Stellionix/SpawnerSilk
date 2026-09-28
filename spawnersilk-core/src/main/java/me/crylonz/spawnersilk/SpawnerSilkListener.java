@@ -11,7 +11,6 @@ import org.bukkit.block.CreatureSpawner;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.EntityType;
-import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
@@ -202,9 +201,13 @@ public class SpawnerSilkListener implements Listener {
         }
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.HIGHEST)
     public void onPlayerInteractEvent(PlayerInteractEvent e) {
         if (e.getAction() != Action.RIGHT_CLICK_BLOCK || e.getClickedBlock() == null || e.getClickedBlock().getType() != getSpawnerMaterial()) {
+            return;
+        }
+
+        if (e.useInteractedBlock() == Event.Result.DENY) {
             return;
         }
 
@@ -214,7 +217,7 @@ public class SpawnerSilkListener implements Listener {
             return;
         }
 
-        if (e.getItem() == null || !e.getItem().getType().name().toUpperCase().contains("EGG")) {
+        if (e.getItem() == null || !e.getItem().getType().name().endsWith("_SPAWN_EGG")) {
             return;
         }
 
@@ -226,8 +229,7 @@ public class SpawnerSilkListener implements Listener {
         cs.update();
 
         if (plugin.getDataConfig().getBoolean(SpawnerSilkConfig.USE_EGG)
-                && e.getPlayer().getGameMode() != GameMode.CREATIVE
-                && e.getHand() == EquipmentSlot.HAND) {
+                && e.getPlayer().getGameMode() != GameMode.CREATIVE) {
             ItemStack item = e.getItem();
             item.setAmount(item.getAmount() - 1);
         }

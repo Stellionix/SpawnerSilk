@@ -1,6 +1,6 @@
 allprojects {
     group = "me.crylonz.spawnersilk"
-    version = "5.9.2"
+    version = "5.9.3"
 }
 
 tasks.register("printVersion") {

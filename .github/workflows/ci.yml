@@ -33,3 +33,23 @@ jobs:
 
       - name: Build and run tests
         run: ./gradlew build --no-daemon
+
+      - name: Build distributable
+        if: github.event_name == 'push'
+        run: ./gradlew :spawnersilk-core:shadowJar --no-daemon
+
+      - name: Select versioned artifact
+        if: github.event_name == 'push'
+        shell: bash
+        run: |
+          version=$(./gradlew -q printVersion)
+          echo "PLUGIN_JAR=spawnersilk-core/build/libs/spawner-silk-${version}.jar" >> "$GITHUB_ENV"
+
+      - name: Upload distributable
+        if: github.event_name == 'push'
+        uses: actions/upload-artifact@v4
+        with:
+          name: spawnersilk-distribution
+          path: ${{ env.PLUGIN_JAR }}
+          if-no-files-found: error
+          retention-days: 30
